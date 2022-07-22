@@ -1,0 +1,4 @@
+1 - Actualizar fuente
+2 - Actualizar trigger
+	* en el cierre de estacion debido a que no hayy turnos
+          cambiar algunos parametros en el cambio estado 0

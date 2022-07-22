@@ -1,0 +1,452 @@
+﻿@model IEnumerable<CapaEntidad.Estacion>
+
+@{
+    ViewBag.Title = "ListaEstacion";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+<!--Agregar la referencia del hubs, el buscara todos los hub existente usando AppStart de la aplicacion-->
+<script src="@Url.Content("~/signalr/hubs")"></script>
+<script>
+    //script para gestionar las tickets
+    //asignadas a las estaciones de trabajos
+    $(document).ready(function () {
+        //Crear la referencia al hub estaciones (usar minuscula camillada a la clase)
+        //para detectar usuarios en la estación
+        var Estacionhub = $.connection.estacionHub;
+        $.connection.hub.start().done(function () {
+            //Listado de estaciones con ticket
+            Estacionhub.server.obtenerListado().done(function (EstacionesActivas) {
+                $(".UsuarioA").html("-----------");
+                $(".TicketA").html("-----------");
+
+                $.each(EstacionesActivas, function (index, estacion) {
+                    //recorrer los cardView obteniendo el data-id
+                    $(".cardView").each(function () {
+                        if ($(this).data('id') == estacion.CodEstacion) {
+                            $(this).find(".UsuarioA").html("<strong>" + estacion.Usuario.Cuenta + "</strong>");
+                            $(this).find(".TicketA").html("<strong>" + estacion.Ticket + "</strong>");
+
+                            if (estacion.Ticket == null || estacion.Ticket == "") {
+                                $(this).find(".TicketA").addClass("btn-danger");
+                                $(this).find(".TicketA").removeClass("btn-success");
+                            } else {
+                                $(this).find(".TicketA").addClass("btn-success");
+                                $(this).find(".TicketA").removeClass("btn-danger");
+                            }
+                        }
+                    });
+
+                });
+              
+            });
+
+        });
+
+        //verificar las estaciones conectadas y los tickets
+        //que se encuentran en la estacion
+        Estacionhub.client.conectadosEstacion = function (EstacionesActivas) {
+            $(".UsuarioA").html("-----------");
+            $(".TicketA").html("-----------");
+
+            $.each(EstacionesActivas, function (index, estacion) {
+                //recorrer los cardView obteniendo el data-id
+                $(".cardView").each(function () {
+                    if ($(this).data('id') == estacion.CodEstacion) {
+
+                        $(this).find(".UsuarioA").html("<strong>" + estacion.Usuario.Cuenta + "</strong>");
+                        $(this).find(".TicketA").html("<strong>" + estacion.Ticket + "</strong>");
+
+                        if (EstacionesActivas.length == 0) {
+                            $(this).find(".TicketA").addClass("btn-danger");
+                            $(this).find(".TicketA").removeClass("btn-success");
+                        } else {
+                            $(this).find(".TicketA").addClass("btn-success");
+                            $(this).find(".TicketA").removeClass("btn-danger");
+                        }
+                    }
+                });
+
+            });
+        };
+
+    });
+</script>
+
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagActual">Lista de estaciones</li>
+        </ol>
+    </section>
+</div>
+
+
+<div class="row contentype">
+    <section class="col-md-12">
+        <a id ="btnCrearModal" class='btn btn-success pull-right' href='#' id='btn-Crear'>Crear Estación <span class='glyphicon glyphicon-plus'></span></a>
+    </section>
+</div>
+
+<div class="row contentype" style="margin-top:25px">
+    <section class="col-md-12">
+        <div class="panel-group">
+            <!--Panel-->
+            <div class="panel panel-default" style="border-radius:0px">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        Área de préstamos
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    @foreach (var item in Model){
+                        if (item.Area.IdZona == "01" || item.Area.IdZona == "03")
+                        {
+                       <!--CardView-->
+                       <div class="col-md-2 col-lg-2 cardView" style="margin-top:10px" data-id="@item.IdEstacion">
+                           <div class="panel panel-info" style="border:solid 1px #808080">
+                               <div class="panel-body">
+                                   <a href="#" style="display:block; position:absolute; top:0; left:80%"><span class="glyphicon glyphicon-th"></span></a>
+                                   <div class="col-xs-12 col-md-4" style="margin:0px; padding:0px">
+                                       <div class="">
+                                           <center><img class="text-center" src="@Url.Content("~/Images/Icons/estacion.png")" width="40" height="40" /></center>
+                                       </div>
+                                       <div class="clearfix"></div>
+                                   </div>
+
+                                   <div class="col-xs-12 col-md-8" style="margin:0px; padding:0px">
+                                       <div style="margin-left:5px">
+                                           <h6 class="text-center" style="color:#1565c0"><strong><a href="#">@item.NombreEstacion</a></strong></h6>
+                                       </div>
+                                       <div class="clearfix"></div>
+                                   </div>
+
+                                   <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                       <h6 class="text-center" style="color:#1565c0"><strong>@item.IpLocal</strong></h6>
+                                       <div class="clearfix"></div>
+                                   </div>
+
+                                   <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                       <h6 class="text-center UsuarioA" style="color:#1565c0"><strong>@item.UsuarioP</strong></h6>
+                                       <div class="clearfix"></div>
+                                   </div>
+
+                                   <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                       <center>
+                                           <a class="text-center TicketA btn btn-md btn-danger"><strong>-----------</strong></a>
+                                       </center>
+                                       <div class="clearfix"></div>
+                                   </div>
+                               </div>
+                           </div>             
+                       </div>
+                       <!--CardView-->
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="col-md-12">
+        <div class="panel-group">
+            <!--Panel-->
+            <div class="panel panel-default" style="border-radius:0px">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        Área de Recuperaciones
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    @foreach (var item in Model)
+                    {
+                        if (item.Area.IdZona == "02")
+                        {
+                            <!--CardView-->
+                            <div class="col-md-2 col-lg-2 cardView" style="margin-top:10px" data-id="@item.IdEstacion">
+                                <div class="panel panel-info" style="border:solid 1px #808080">
+                                    <div class="panel-body">
+                                        <a href="#" style="display:block; position:absolute; top:0; left:80%"><span class="glyphicon glyphicon-th"></span></a>
+                                        <div class="col-xs-12 col-md-4" style="margin:0px; padding:0px">
+                                            <div class="">
+                                                <center><img class="text-center" src="@Url.Content("~/Images/Icons/estacion.png")" width="40" height="40" /></center>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-8" style="margin:0px; padding:0px">
+                                            <div style="margin-left:5px">
+                                                <h6 class="text-center" style="color:#1565c0"><strong> <a href="#">@item.NombreEstacion</a> </strong></h6>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                            <h6 class="text-center" style="color:#1565c0"><strong>@item.IpLocal</strong></h6>
+                                            <div class="clearfix"></div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                            <h6 class="text-center" style="color:#1565c0"><strong>@item.UsuarioP</strong></h6>
+                                            <div class="clearfix"></div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                            <h6 class="text-center" id="Ticket"><strong>-----------</strong></h6>
+                                            <center>
+                                                @if (item.Estado == "ACTIVA")
+                                                {
+                                                    <a href="#" class="btn btn-success btn-xs" data-conectado="true" data-estacion="@item.IdEstacion" data-nombre="@item.NombreEstacion" data-ip="@item.IpLocal">
+                                                        <strong>@item.Estado</strong>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#" class="btn btn-danger btn-xs" data-conectado="false" data-estacion="@item.IdEstacion" data-nombre="@item.NombreEstacion" data-ip="@item.IpLocal">
+                                                        <strong>@item.Estado</strong>
+                                                    </a>
+                                                }
+                                            </center>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                       <!--CardView-->
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#btnCrearModal").click(function () {
+            //abrir modal
+            $("#CrearEstacion-Modal").modal({
+                show: "true"
+            });
+        });
+
+    });
+</script>
+
+<!--modal Creacion Estacíon-->
+<div class="modal modal-open fade" id="CrearEstacion-Modal" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" style="color:#000"><strong>Crear Estación</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Usuario Solicitante</label>
+                        <input type="text" class="form-control" id="Usuario" name="Usuario" value="@Session["User"].ToString()" readonly="readonly" style="max-width:100%">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label class="control-label">IP estación</label>
+                        <input type="text" class="form-control" id="IP" name="IP" placeholder="Ingrese la dirección IP" style="max-width:100%">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Área de trabajo</label>
+                        <select id="Zona" class="form-control" style="max-width:100%"></select>
+                        <script>
+                            //script que permite carga las areas disponibles,
+                            //busca el metodo CatalogoZona del controlador 'Turno'
+                            //la búsqueda lo realiza por ajax
+                            $(document).ready(function () {
+                                zona = "";
+                                $.ajax({
+                                    url: '@Url.Action("CatalogoZona", "Turno")',
+                                    //si existe respuesta, entonces rellenar el select $("#Zona")
+                                    success: function (data) {
+                                        $.each(data, function (i, value) {
+                                            if (value.Value == "01")
+                                                zona += "<option value='" + value.Value + "' selected='selected'>" + value.Text + "</option>";
+                                            else
+                                                zona += "<option value='" + value.Value + "'>" + value.Text + "</option>";
+                                        });
+                                        $("#Zona").html(zona);
+
+                                    },
+                                    complete: function () {
+                                        $.ajax({
+                                            url: '@Url.Action("CatalogoMotivo", "Turno")' + "?IdZona=" + $("#Zona").val(),
+                                            success: function (data) {
+                                                visita = "";
+                                                $.each(data, function (i, value) {
+                                                    visita += "<option value='" + value.Value + "'>" + value.Text + "</option>";
+                                                });
+                                                $("#Visita").html(visita);
+                                            },
+                                            complete: function () {
+                                                $("#Visita").multipleSelect({
+                                                    placeholder: "Seleccione la opción adecuada",
+                                                    selectAll: false,
+                                                    filter: true
+                                                });
+                                                $(".ms-choice").css("border", "none");
+                                            }
+                                        });
+
+                                       
+                                     }
+                                });
+                            });            
+                        </script>
+                        
+                        
+                    </div>
+                </div>
+
+
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Tipo de visita a atender</label>
+                        <select id="Visita" name="Visita[]" class="form-control" style="border:none"></select>
+                        <script>
+                                $(document).ready(function () {
+                                    //script que permite carga las los motivos de visita disponibles según la zona,
+                                    //busca el metodo CatalogoMotivo del controlador 'Turno'
+                                    //la búsqueda lo realiza por ajax
+                                    $("#Zona").change(function () {
+                                        CodZona = $(this).val(); //obtener el valor de la zona seleccionada
+                                        $.ajax({
+                                            url: '@Url.Action("CatalogoMotivo", "Turno")' + "?IdZona=" + CodZona,
+                                        success: function (data) {
+                                            visita = "";
+                                            $.each(data, function (i, value) {
+                                                visita += "<option value='" + value.Value + "'>" + value.Text + "</option>";
+                                            });
+                                            $("#Visita").html(visita);
+                                        },
+                                        complete: function () {
+                                            $("#Visita").multipleSelect({
+                                                 placeholder: "Seleccione la opción adecuada",
+                                                 selectAll: false,
+                                                 filter: true
+                                            });
+                                            $(".ms-choice").css("border","none");
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+                <input type="button" value="Crear Estación" name="CrearEstacion" id="CrearEstacion" class="btn btn-success pull-right">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="text-left notificacion" role="alert"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--modal cerrar proceso-->
+<div class="modal modal-open fade" id="Finalizado-Modal" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" style="color:#000"><strong>Estado del proceso de la creación</strong></h3>
+            </div>
+            <div class="modal-body">
+                <p><h4 id="message-logTitle">Estación creada</h4></p>
+                <p><h5 id="message-log">por favor revisar la lista de estaciones</h5></p>
+            </div>
+
+            <div class="modal-footer">
+                <a href="@Url.Action("ListaEstacion", "Estacion", new { usuario = Session["User"].ToString() })" class="btn btn-danger">Cerrar</a>
+            </div>
+        </div>
+    </div>                         
+</div>                                           
+
+
+
+
+
+ <script>
+     $(document).ready(function () {
+         //crear variables y objetos
+
+         //Objeto Zona
+         var Zona, Estacion, EstacionMotivo, Motivo = new Object();
+         var ListaMotivos = [];
+
+         //evento guardado de estacion
+         $("#CrearEstacion").click(function () {
+             $(".notificacion").removeClass("alert alert-error");
+             $(".notificacion").removeClass("alert alert-warning");
+             var ListaMotivos = [];
+             //Objeto Zona
+             Zona = { IdZona: $("#Zona").val() };
+             //Objeto Estacion
+             Estacion = { IpLocal: $("#IP").val(), Area: Zona }
+
+             //recorrer todos los checkbox de las visitas y crear el objeto Motivo
+             $("input:checkbox").each(function () {
+                 if ($(this).is(':checked')) 
+                     Motivo = { IdMotivo: $(this).val(), Asignado: true, Zona: Zona }
+                 else
+                     Motivo = { IdMotivo: $(this).val(), Asignado: false, Zona: Zona }
+                 //agregar al arreglo
+                 ListaMotivos.push(Motivo);
+             });
+
+
+
+             //terminado la recoleccion de variable, crear el objeto
+             EstacionMotivo = { Estacion: Estacion, Motivos: ListaMotivos }
+
+             //enviar la solicitud via ajax, se enviara el objeto al controlador Estacion
+             $.ajax({
+                 url: "@Url.Action("RegistrarEstacion", "Estacion")",
+                 data: JSON.stringify(EstacionMotivo), //serializar a json 
+                 type: "POST", //verbo definido post
+                 //se enviará el formato tipo json
+                 contentType: "application/json;charset=utf-8", 
+                 dataType: "json",
+                 //respuessta
+                 success: function (response) {
+                     if (response == "true" || response == true) {
+                         $('#CrearEstacion-Modal').modal('hide');
+                         //abrir modal
+                         $("#Finalizado-Modal").modal({
+                             show: "true",
+                             backdrop: 'static',
+                             keyboard: false
+                         });
+                     } else {
+                         $(".notificacion").addClass("alert alert-danger");
+                         $(".notificacion").html("ERROR AL GRABAR ESTACIÓN")
+                     }
+                 }
+            });
+
+         });
+     });
+ </script>
+
+

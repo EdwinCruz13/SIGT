@@ -1,0 +1,51 @@
+﻿<script>
+    $(document).ready(function(){
+       GraficaLineal();
+
+
+        function GraficaLineal() {
+                         var Total = @ViewBag.pivotRecuperaciones.Total + @ViewBag.pivotPrestamo.Total;
+                        //declarar las opciones del gráfico de barra
+                        var options = {
+                            chart: { renderTo: 'containerHoraArea', scrollablePlotArea: { minWidth: 700 } },
+                            title: { text: 'Valoración de tickets atendidos' },
+                            subtitle: { text: 'Al día de hoy: ' + Total + "<br>Tickets Préstamos = " + '@ViewBag.pivotPrestamo.Total' + "<br>Tickets Recuperaciones  = " + '@ViewBag.pivotRecuperaciones.Total' },
+                            xAxis: {
+                                categories: ['8am', '9am', '10am', '11am', '12md', '1pm', '2pm', '3pm', '4pm', '5pm']
+                                //type: 'datetime',
+                                //dateTimeLabelFormats: { month: '%e. %b', year: '%b' },
+                                //title: { text: 'Rango de tiempo' },
+                                //tickInterval: 1 * 24 * 3600 * 1000,
+                                //tickWidth: 0,
+                                //gridLineWidth: 1,
+                                //labels: { align: 'left', x: 3, y: -3 }
+                            },
+                            yAxis: [{ title: { text: 'Número de Tickets' }, labels: { align: 'left', x: 3, y: 20, format: '{value:.,0f}' }, showFirstLabel: false }],
+                            credits: { enabled: false  },
+                            plotOptions: { line: {  dataLabels: { enabled: true, crop: false,  inside: false,  overflow: 'none' }, enableMouseTracking: true }, series: { cursor: 'pointer', point: { events: {}  },  marker: { lineWidth: 1 } } },
+
+                            legend: { enabled: true, align: 'right', verticalAlign: 'bottom', borderWidth: 0 },
+                            tooltip: { shared: true, crosshairs: true },
+                            series: [{
+                                name: 'Total de Tickets en préstamo',
+                                data: [@ViewBag.pivotPrestamo._8, @ViewBag.pivotPrestamo._9, @ViewBag.pivotPrestamo._10, @ViewBag.pivotPrestamo._11, @ViewBag.pivotPrestamo._12, @ViewBag.pivotPrestamo._13, @ViewBag.pivotPrestamo._14, @ViewBag.pivotPrestamo._15, @ViewBag.pivotPrestamo._16, @ViewBag.pivotPrestamo._17]
+                            },
+                            {
+                                name: 'Total de Tickets en Recuperaciones',
+                                data: [@ViewBag.pivotRecuperaciones._8, @ViewBag.pivotRecuperaciones._9, @ViewBag.pivotRecuperaciones._10, @ViewBag.pivotRecuperaciones._11, @ViewBag.pivotRecuperaciones._12, @ViewBag.pivotRecuperaciones._13, @ViewBag.pivotRecuperaciones._14, @ViewBag.pivotRecuperaciones._15, @ViewBag.pivotRecuperaciones._16, @ViewBag.pivotRecuperaciones._17]
+                            }]
+                        };
+
+                        //agregar a la serie del highchart
+                        options.plotOptions.series.point.events = { click: function (e) { hs.htmlExpand(null, { pageOrigin: { x: e.pageX || e.clientX, y: e.pageY || e.clientY }, headingText: this.series.name, maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) + ':<br/> ' + this.y + ' usuarios', width: 200 }) } }
+                        renderGraph = new Highcharts.Chart(options);
+
+
+                }    
+
+     
+    });
+</script>
+
+
+<div id="containerHoraArea" style="z-index:-10; max-width:100%"></div>

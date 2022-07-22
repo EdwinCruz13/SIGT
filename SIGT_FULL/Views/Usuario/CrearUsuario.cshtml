@@ -1,0 +1,211 @@
+﻿@model CapaEntidad.Usuario
+
+@{
+    ViewBag.Title = "CrearUsuario";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagActual"><a href="@Url.Action("ListaUsuario", "Usuario", new { usuario = Session["User"].ToString() })">Lista de usuarios</a></li>
+            <li class="PagActual">Crear usuario</li>
+        </ol>
+    </section>
+</div>
+
+<div class="row contentype">
+    <section class="col-md-12" style="margin-bottom:25px">
+        @using (Ajax.BeginForm("CrearUsuario", "Perfiles", new AjaxOptions { HttpMethod = "POST", OnSuccess = "Resultado" }, new { @class = "form-horizontal" })){
+            @Html.AntiForgeryToken()
+            <fieldset>
+                <legend style="padding-bottom:5px">
+                    <span class="pull-left"><strong>Crear cuenta de usuario</strong></span>
+                    <span class="pull-right">
+                        <button type="submit" class="btn btn-success">Crear cuenta <span class="glyphicon glyphicon-file"></span></button>
+                    </span>
+                    <span class="clearfix"></span>
+                </legend>
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="col-md-push-3 col-md-7">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">Completar formulario</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group" style="border-bottom:dashed 1px #808080; padding:15px">
+                                <label class="control-label col-md-3">Nombre completo</label>
+                                <div class="col-md-9">
+                                    @Html.EditorFor(model => model.NombreCompleto, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.NombreCompleto, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="border-bottom:dashed 1px #808080; padding:15px">
+                                <label class="control-label col-md-3">Usuario</label>
+                                <div class="col-md-9">
+                                    @Html.EditorFor(model => model.Cuenta, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.Cuenta, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="border-bottom:dashed 1px #808080; padding:15px">
+                                <label class="control-label col-md-3">Contraseña</label>
+                                <div class="col-md-9">
+                                    @Html.EditorFor(model => model.Contrasena, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.Contrasena, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="border-bottom:dashed 1px #808080; padding:15px">
+                                <label class="control-label col-md-3">Cédula de identidad</label>
+                                <div class="col-md-9">
+                                    @Html.EditorFor(model => model.CedulaIdentidad, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.CedulaIdentidad, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="border-bottom:dashed 1px #808080; padding:15px">
+                                <label class="control-label col-md-3"># Emp.</label>
+                                <div class="col-md-9">
+                                    @Html.EditorFor(model => model.CodEmpleado, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.CodEmpleado, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="border-bottom:dashed 1px #808080; padding:15px">
+                                <label class="control-label col-md-3">Área</label>
+                                <div class="col-md-9">
+                                    @{
+                                        List<SelectListItem> listArea = new List<SelectListItem>();
+                                        listArea.Add(new SelectListItem
+                                        {
+                                            Text = "Préstamos",
+                                            Value = "01",
+                                            Selected = true
+                                        });
+                                        listArea.Add(new SelectListItem
+                                        {
+                                            Text = "Recuperaciones",
+                                            Value = "02",
+
+                                        });
+
+                                        listArea.Add(new SelectListItem
+                                        {
+                                            Text = "Préstamos Asesoria Legal",
+                                            Value = "03",
+
+                                        });
+                                    }
+                                    @Html.DropDownListFor(model => model.Area.IdZona, listArea, new { @id = "Zonas", @class = "form-control" })
+
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="padding:15px">
+                                <label class="control-label col-md-3">Perfil</label>
+                                <div class="col-md-9">
+                                    @{
+                                        List<SelectListItem> listItems = new List<SelectListItem>();
+                                        listItems.Add(new SelectListItem
+                                        {
+                                            Text = "Atención al cliente",
+                                            Value = "2",
+                                            Selected = true
+                                        });
+                                        listItems.Add(new SelectListItem
+                                        {
+                                            Text = "Administrador",
+                                            Value = "1",
+
+                                        });
+                                        listItems.Add(new SelectListItem
+                                        {
+                                            Text = "Expendedor de ticket",
+                                            Value = "3",
+
+                                        });
+
+                                        listItems.Add(new SelectListItem
+                                        {
+                                            Text = "Auditor",
+                                            Value = "5",
+
+                                        });
+                                    }
+                                    @Html.DropDownListFor(model => model.Perfil.IdPerfil, listItems, new { @id = "perfiles", @class = "form-control" })
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+                
+                <div id="BlockError" class="form-group col-md-12" style="display:none">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 id="add_err"></h4>
+                    </div>
+                </div>
+            </fieldset>
+        }
+
+    </section>
+    <!--Modal de mensaje una vez que haya creado el usuarios-->
+    <div class="modal modal-open fade" id="Modal-UsuarioCreado" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background: rgba(0,71,112,0);">
+                    <h3 class="modal-title" style="color: #000"><strong>Control de usuario</strong></h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <h4 class="text-justify"><strong>Se ha creado correctamente el usuario.</strong></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<script type="text/javascript">
+    function Resultado(response) {
+        if (response == false) {
+            $("#add_err").html("Problemas con la actualizacion de los datos.");
+            $("#BlockError").css("display","block");
+        }
+
+            //si se guardo correctamente
+        else {
+            //abrir el modal para la asignacion del ticket
+            $("#Modal-UsuarioCreado").modal({
+                show: "true",
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            //despues de un tiempo, cerrar modal y redireccionar
+            setTimeout(function () {
+                //cerrar modal
+                $('#Modal-AsignarNuevo_Ticket').modal('hide');
+
+                // si la respuesta es true, redireccionar
+                window.location.href = '@Url.Action("ListaUsuario", "Usuario")' + "?usuario=" + '@Session["User"].ToString()';
+            }, 2000);
+
+        }
+
+     }
+</script>
+
+

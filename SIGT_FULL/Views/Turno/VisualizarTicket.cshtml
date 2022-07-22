@@ -1,0 +1,49 @@
+﻿@model CapaReportes.Ticket
+
+
+@{
+    ViewBag.Title = "VisualizarTicket";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+<!--Extenciones para generar script js para reportes-->
+@Html.DevExpress().GetStyleSheets(
+        new StyleSheet { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+        new StyleSheet { ExtensionSuite = ExtensionSuite.Editors },
+        new StyleSheet { ExtensionSuite = ExtensionSuite.Report }
+    )
+    @Html.DevExpress().GetScripts(
+        new Script { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+        new Script { ExtensionSuite = ExtensionSuite.Editors },
+        new Script { ExtensionSuite = ExtensionSuite.Report }
+    )
+
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagAnterior"><a href="@Url.Action("ListaTicket", "Turno", new { usuario = Session["User"].ToString() })">Turno</a></li>
+            <li class="PagAnterior"><a href="@Url.Action("RegistrarTicket", "Turno", new { usuario = Session["User"].ToString() })">Generar Ticket</a></li>
+            <li class="PagActual">Imprimir Ticket</li>
+        </ol>
+    </section>
+</div>
+
+<article class="pull-right">
+    <a href="@Url.Action("RegistrarTicket", "Turno", new { usuario = Session["User"].ToString() })" class="btn btn-primary">
+        <span class="glyphicon glyphicon-plus"></span>
+        Crear Ticket
+    </a>
+</article>
+<div class="clearfix"></div>
+
+
+<div class="row contentype" style="margin-top:25px">
+    <section class="col-md-12">
+        @Html.DevExpress().WebDocumentViewer(settings =>
+        {
+           settings.Name = "rptTicket";
+        }).Bind(Model).GetHtml()
+    </section>
+</div>

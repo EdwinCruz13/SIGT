@@ -1,0 +1,134 @@
+﻿<h4>
+    <small class="pull-left" style="color:#9e9e9e"><i class="glyphicon glyphicon-user"></i> <b>Distribucción de atención de @ViewBag.area</b></small>
+    <small class="pull-right" style="color:#9e9e9e"><i class="glyphicon glyphicon-tasks"></i></small>
+    <span class="clearfix"></span>
+</h4>
+<hr />
+
+
+<div id="PieGraphArea_@ViewBag.usuario" style="min-width: 310px; height: 400px; margin: 0 auto; background:#fff;"></div>
+<script>
+    $(document).ready(function () {
+        var renderGraph;
+        InitializeComponent();
+
+        function InitializeComponent() {
+            $.ajax({
+                url: "@Url.Action("_PieGraph_AtencionUsuario", "Reporte")" + "?usuario=" + '@ViewBag.usuario' + "&fi=" + '@ViewBag.fi' + "&ff=" + '@ViewBag.ff',
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result === undefined || result === null) {
+                        renderGraph.destroy();
+                        alert("No existen datos encontrados en ese rango de fecha");
+                    }
+                    else {
+
+                        pieGraph(result);
+                    }
+
+                },
+                beforeSend: function () {
+                    $(".load-img").css("display", "block");
+                },
+                complete: function () {
+                    $(".load-img").css("display", "none");
+                    $(".highcharts-legend").css("display", "none");
+                },
+                error: function () {
+                    alert("Error al cargar grafica");
+                }
+            });
+
+
+        }
+
+        //crear gráfica
+        function pieGraph(element) {
+
+            var pieColors = (function () {
+                var colors = [],
+                    base = Highcharts.getOptions().colors[0],
+                    i;
+
+                for (i = 0; i < 10; i += 1) {
+                    // Start out with a darkened base color (negative brighten), and end
+                    // up with a much brighter color
+                    colors.push(Highcharts.Color(base).brighten((i - 3) / 7).get());
+                }
+                return colors;
+            }());
+
+            //declarar las opciones del gráfico de barra
+            var options = {
+                chart: { renderTo: 'PieGraphArea_' + '@ViewBag.usuario', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false, backgroundColor: 'rgba(255, 255, 255, 0.0)', type: 'pie' },
+                title: { text: '<span style="font-size:12px"> Tiempo de atención</span> <br><span style="font-size:12px"> del ' + FechaInicio + " al " + FechaFin + "</span>" },
+                 subtitle: {
+                     align: 'center',
+                     text: 'Menos de 10min = ' + element.min0_10 + " | 10min a 30min = " + element.min10_30 + " | 31min a 60min = " + element.min30_60 + " | mas de 60min = " + element.min60_max + " <br> Total = " + element.TotalTickets,
+                     style: { fontSize: '11px' }
+                },
+
+                credits: {  enabled: false },
+                tooltip: {
+                    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f} tickets</b><br/>'
+                },
+                credits: {
+                    enabled: false
+                },
+
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        size: "90%",
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                            },
+                            connectorColor: 'silver'
+                        },
+                        colors: pieColors,
+                        showInLegend: true
+                    }
+                },
+
+
+                series: [{
+                    name: 'Reporte 1',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'Menos de 10Min',
+                        y: element.min0_10,
+                        sliced: true,
+                        selected: true
+
+                    },{
+                        name: 'de 11min a 30min',
+                        y: element.min10_30
+                    },{
+                        name: 'de 31min a 60min',
+                        y: element.min30_60
+                    }, {
+                        name: 'Mas de 60min',
+                        y: element.min60_max
+                    }]
+
+                }]
+            };
+
+            //agregar a la serie los datos
+            renderGraph = new Highcharts.Chart(options);
+
+        }
+    });
+</script>
+
+
+
+
+

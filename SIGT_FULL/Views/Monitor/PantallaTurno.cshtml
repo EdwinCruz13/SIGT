@@ -1,0 +1,614 @@
+﻿@model IEnumerable<CapaEntidad.Estacion>
+@{
+    ViewBag.Title = "Publicidad";
+    Layout = "~/Views/Shared/_MonitorLayout.cshtml";
+}
+
+
+
+<!--Agregar la referencia del hubs, el buscara todos los hub existente usando AppStart de la aplicacion-->
+<script src="@Url.Content("~/signalr/hubs")"></script>
+<script>
+    $(document).ready(function () {
+        var duration;
+
+        //cronometro - cuenta regresiva
+        var tiempo_regresivo = null;
+        var tiempo = { hora: 0, minuto: 0, segundo: 0 };
+        var estado = true;
+
+        var timbre; // timbre para el llamado
+        var turno; //turno que se esta llamando
+        var estacion; //estación donde stan llamando
+
+        var TicketL;
+        var EstacionL;
+       
+
+        //Crear la referencia al hub (usar minuscula camillada a la clase)
+        var hub = $.connection.monitorHub;
+        //inicialistar el hub
+        $.connection.hub.start().done(function () {
+            //ocultar controles del reproductor
+            $("#jp_container_1").css("border", "none");
+            $("#jp_container_1").css("background", "none");
+            $("#jp_container_1 .jp-gui").css("z-index", "-1");
+
+            $("#jp_container_2").css("border", "none");
+            $("#jp_container_2").css("background", "none");
+            $("#jp_container_2 .jp-gui").css("z-index", "-1");
+
+            $("#jp_container_3").css("border", "none");
+            $("#jp_container_3").css("background", "none");
+            $("#jp_container_3 .jp-gui").css("z-index", "-1");
+
+
+        });
+
+        $.connection.hub.disconnected(function () {
+            if ($.connection.hub.lastError) {
+                //console.log("disconnected reason:" + $.connection.hub.lastError.message);
+                window.location.href = '@Url.Action("Index", "Monitor")';
+            }
+            setTimeout(function () {
+                $.connection.hub.start();
+                //var d = CrearReproductor_1(turno, estacion)
+            }, 3000);
+        });
+
+
+        ////mostrar areas que corresponda al monitor
+        //hub.client.listaTickets = function (list) {
+        //    list.forEach(function (ticket, codIndex) {
+        //        console.log("Persona " + codIndex + " | Nombre: " + ticket.Ticket)
+        //    });
+        //};
+
+        //ver respuesta del hub
+        //agregar a pantalla la estación y el turno
+        //si recibe la respuesta, añadir el turno al monitor y reproducir sonido
+        hub.client.turnoTicket = function (objEstacion) {
+            //mostrar areas que corresponda al monitor
+            if (objEstacion.Turno.Motivo.Zona.IdZona == "@ViewBag.CodArea") {
+              
+                //console.log("time: " + tiempo.segundo + " Estado: " + estado);
+
+                //si el cronometro esta en 0, ejecutar el sonido 
+                //y cambiar el texto para afirmar al cliente y el llamado
+                if (tiempo.segundo == 0 && estado == true) {
+                    //console.log("ENTRÉ...");
+
+
+                    //setear los parametros turno y estación
+                    turno = objEstacion.Ticket.replace("-", "");
+                    estacion = objEstacion.NombreEstacion;
+
+                    /////////////////////TEXTO/////////////////////
+                    //cuando recibe la respuesta, asignar texto a los distintos div
+                    $("#Turno_Actual").html(turno);
+                    $("#Estacion_Actual").html(estacion);
+                    $(".TicketE").each(function () {
+                        //cambiar el estado de la estacion que se encuentra en la lista
+                        if ($(this).data('codestacion') == objEstacion.CodEstacion) {
+                            $(this).html(objEstacion.Ticket);
+                        }
+                    });
+
+                   
+                    IniciarCuentaRegresiva();
+                    /////////////////////SONIDO/////////////////////
+                    //ejecutar el sonido
+                    soundTimbre = CrearReproductor_1(turno, estacion);
+
+                }
+                    
+            }
+
+        };
+
+        //funcion para la cuenta regresiva
+        function IniciarCuentaRegresiva() {
+            estado = false;
+            //tiempo
+            //clearInterval(tiempo_regresivo);
+            tiempo_regresivo = setInterval(function () {
+                // Segundos
+                tiempo.segundo++;
+                //console.log(tiempo.segundo);
+                if (tiempo.segundo > 9) {
+                    tiempo.segundo = 0;
+                    estado = true;
+                    DetenerCuentaRegresiva();
+                }
+            }, 1000);
+        }
+
+        //funcion para deterner la cuenta regresiva
+        function DetenerCuentaRegresiva() {
+            //detener cuenta regresiva
+            clearInterval(tiempo_regresivo);
+
+        }
+
+
+
+        //creacion del primer reproductor sonido de timbre, un único sonido por defecto
+        function CrearReproductor_1(turno, estacion) {
+            return $("#jquery_jplayer_1").jPlayer({
+                ready: function () {
+                    $("#jquery_jplayer_1").jPlayer("setMedia", {
+                        mp3: '@Url.Content("~/Sounds/alert.mp3")'
+                    }).jPlayer("play");
+
+                },
+                ended: function () {
+                    var t = CrearReproductor_2(turno, estacion);
+                    //$("#jquery_jplayer_1").jPlayer("destroy");
+                },
+                swfPath: '@Url.Content("~/App/jPlayer/dist/jplayer")',
+                solution: "flash,html",
+                supplied: "mp3",
+                keyEnabled: false,
+                playlistOptions: {
+                    autoPlay: false,
+                    enableRemoveControls: false
+                },
+            });
+        }
+
+        //creacion del primer reproductor sonido de ticket y estación,
+        //recibira de parametro el ticket a presentar y la estacion
+        function CrearReproductor_2(Ticket, Turno) {
+            //setear segundo reproductor
+            return $("#jquery_jplayer_2").jPlayer({
+                ready: function (event) {
+                    $(this).jPlayer("setMedia", { mp3: '@Url.Content("~/Sounds/Turno/")' + Ticket + ".mp3" }).jPlayer("play");
+                },
+                ended: function () {
+                    var e = CrearReproductor_3(turno, estacion);
+                    //$("#jquery_jplayer_2").jPlayer("destroy");
+                },
+                swfPath: '@Url.Content("~/App/jPlayer/dist/jplayer")',
+                solution: "flash,html",
+                supplied: "mp3",
+                keyEnabled: false,
+                playlistOptions: {
+                    autoPlay: false,
+                    enableRemoveControls: false
+                },
+            });
+        }
+
+        //crear el tercer reproductor usando la estacion como sonido
+        function CrearReproductor_3(Turno, Estacion) {
+            //setear segundo reproductor
+            return $("#jquery_jplayer_3").jPlayer({
+                ready: function (event) {
+                    $(this).jPlayer("setMedia", { mp3: '@Url.Content("~/Sounds/Estacion/")' + Estacion + ".mp3" }).jPlayer("play");
+                },
+                ended: function () {
+                    $("#jquery_jplayer_1").jPlayer("destroy");
+                    $("#jquery_jplayer_2").jPlayer("destroy");
+                    $("#jquery_jplayer_3").jPlayer("destroy");
+                },
+                swfPath: '@Url.Content("~/App/jPlayer/dist/jplayer")',
+                solution: "flash,html",
+                supplied: "mp3",
+                keyEnabled: false,
+                playlistOptions: {
+                    autoPlay: false,
+                    enableRemoveControls: false
+                },
+            });
+        }
+    });
+</script>
+                    
+<nav class="navbar navbar-default" role="navigation" style="background: #1B5E20; border: none; border-radius: 0px; margin: 0px; padding: 0px; z-index: 100; ">
+    <!-- El logotipo y el icono que despliega el menú se agrupan
+         para mostrarlos mejor en los dispositivos móviles -->
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse"
+                data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Desplegar navegación</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a href="#" class="navbar-brand" style="color: #fff; font-family:'CaviarDreams'; font-weight: bold; font-size: 170%;">
+            INSTITUTO DE SEGURIDAD SOCIAL Y DESARROLLO HUMANO
+        </a>
+    </div>
+
+    <!-- Agrupar los enlaces de navegación, los formularios y cualquier
+         otro elemento que se pueda ocultar al minimizar la barra -->
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <div class="nav navbar-nav navbar-right" style="margin-right:15px">
+            
+        </div>
+    </div>
+</nav>
+
+
+
+<section class="col-md-12" style="margin: 0px; padding: 0px;">
+    <div id="panel1" class="col-xs-7 col-sm-7 col-md-7 col-lg-7" style="margin: 0px; padding: 0px; height:100%;">
+        <div style="margin-top:-10px">
+            <div id="TurnoC" class="panel-body">
+                <div class="col-md-12 col-lg-12 page">
+                    <div class="col-md-12 col-lg-12 title" style="margin-top:8%">
+                        <center>
+                            <div id="Caller" class="col-md-12 col-lg-12">
+                                <div class="col-md-12 col-lg-12">
+                                    <h1 style="font-size: 86px; font-family: 'CaviarDreams'; font-weight: bold;">TURNO</h1>
+                                </div>
+                                <div class="col-md-12 col-lg-12">
+                                    <h1 style="font-size: 112px; font-weight: bold; font-family: 'CaviarDreams'; " id="Turno_Actual">@ViewBag.Ticket</h1>
+                                </div>
+                                <div class="col-md-12 col-lg-12">
+                                    <h1 style=" font-size: 86px; font-family: 'CaviarDreams'; font-weight: bold;" id="Estacion_Actual">@ViewBag.Estacion</h1>
+                                </div>
+                            </div>
+                        </center>
+                    </div>
+
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="panel2" class="col-xs-5 col-sm-5 col-md-5 col-lg-5" style="margin: 0px; padding: 0px; box-shadow: -3px 3px 5px 1px rgba(189,189,189,1); position: fixed; right: 0px; height: 100%; ">
+        <section class="col-md-12 col-lg-12" style="margin: 0px; padding: 0px; max-height:100%;">
+
+            <script type="text/javascript">
+                //<![CDATA[
+                $(document).ready(function () {
+                    $("#jquery_jplayer_Video").jPlayer({
+                        ready: function () {
+                            $(this).jPlayer("setMedia", {
+                                title: "Sunset",
+                                //m4v: "http://www.issdhu.gob.ni/VideosApp/V1.mp4",
+                                m4v: "@Url.Content("~/Videos/V2.mp4")",
+                                poster: "192.168.1.2/Images/business.jpg"
+                            }).jPlayer("play");
+                        },
+                        swfPath: "../../dist/jplayer",
+                        supplied: "webmv, ogv, m4v",
+                        size: {
+                            width: "640px",
+                            height: "360px",
+                            cssClass: "jp-video-360p"
+                        },
+                        playlistOptions: {
+                            enableRemoveControls: true,
+                            autoPlay: true
+                        },
+                        useStateClassSkin: true,
+                        autoBlur: false,
+                        smoothPlayBar: true,
+                        keyEnabled: true,
+                        remainingDuration: true,
+                        toggleDuration: true,
+                        fullWindow: false, //full
+                        fullScreen: true, //full
+                        loop: true,  //repetir videos
+                        muted: true,   ///silenciar
+                    });
+
+
+
+                    //despues de cargar el video, parametrizar el reproductor
+                    //con estas propiedades
+                    $("#jp_container_Video .jp-gui").css("display", "none");
+                    $("#jp_container_Video .jp-interface").css("display", "none");
+                    $("#jp_container_Video .jp-details").css("display", "none");
+                    $("#jp_container_Video").css("border", "none");
+                    $("#jquery_jplayer_Video").css("height", "285px"); //325
+
+                });
+                //]]>
+            </script>
+
+            <div id="jp_container_Video" class="jp-video jp-video-270p playme" role="application" aria-label="media player" style="margin-top:-20px">
+                <div class="jp-type-playlist">
+                    <div id="jquery_jplayer_Video" class="jp-jplayer"></div>
+                    <div class="jp-gui" style="display:none">
+                        <div class="jp-video-play">
+                            <button class="jp-video-play-icon" role="button" tabindex="0">play</button>
+                        </div>
+                        <div class="jp-interface">
+                            <div class="jp-progress">
+                                <div class="jp-seek-bar">
+                                    <div class="jp-play-bar"></div>
+                                </div>
+                            </div>
+                            <div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>
+                            <div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>
+                            <div class="jp-controls-holder">
+                                <div class="jp-controls">
+                                    <button class="jp-previous" role="button" tabindex="0">previous</button>
+                                    <button class="jp-play" role="button" tabindex="0">play</button>
+                                    <button class="jp-next" role="button" tabindex="0">next</button>
+                                    <button class="jp-stop" role="button" tabindex="0">stop</button>
+                                </div>
+                                <div class="jp-volume-controls">
+                                    <button class="jp-mute" role="button" tabindex="0">mute</button>
+                                    <button class="jp-volume-max" role="button" tabindex="0">max volume</button>
+                                    <div class="jp-volume-bar">
+                                        <div class="jp-volume-bar-value"></div>
+                                    </div>
+                                </div>
+                                <div class="jp-toggles">
+                                    <button class="jp-repeat" role="button" tabindex="0">repeat</button>
+                                    <button class="jp-shuffle" role="button" tabindex="0">shuffle</button>
+                                    <button class="jp-full-screen" role="button" tabindex="0">full screen</button>
+                                </div>
+                            </div>
+                            <div class="jp-details">
+                                <div class="jp-title" aria-label="title">&nbsp;</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="jp-playlist" style="display:none">
+                        <ul>
+                            The method Playlist.displayPlaylist() uses this unordered list
+                            <li>&nbsp;</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </section>
+
+        <section class="col-md-12 col-lg-12" style="margin: 15px 0px 0px 0px; padding:0px; z-index:100">
+            <div class="col-md-12 col-lg-12" style="background: #fff; margin: 0px; padding: 0px; ">
+                <div class="col-md-12 col-lg-12" style="border-radius: 0px; display: block; width: 100%; background: #1B5E20; margin: 0px; padding: 5px 5px">
+                    <h2 class="panel-title text-center">
+                        <span id="liveclock" style="font-weight: bold; color: #fff; font-size: 24px; font-family: 'CaviarDreams';"></span>
+                    </h2>
+                </div>
+
+                <div class="col-md-12" style="padding: 0; margin: 5px 0px 0px 0px;">
+                    <script>
+                        $(document).ready(function () {
+                            $('.carousel').carousel({
+                                interval: 8000
+                            })
+                        });
+                    </script>
+
+                    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" style="padding: 0; margin: 0;">
+                        <!-- Indicators -->
+                        <ol class="carousel-indicators">
+                            @*<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="2"></li>*@
+                        </ol>
+
+                        <!-- Wrapper for slides -->
+                        <center>
+                            <div class="carousel-inner" role="listbox">
+                                <div class="item active">
+                                    <img src='@Url.Content("~/Images/Sliders/ISSDHU.png")' class="img-responsive" style="height: 200px;">
+                                </div>
+
+                                <div class="item">
+                                    <img src='@Url.Content("~/Images/Sliders/PN.png")' class="img-responsive" style="height: 200px;">
+                                </div>
+                                <div class="item ">
+                                    <img src='@Url.Content("~/Images/Sliders/DGBN.svg")' class="img-responsive" style="height: 200px;">
+                                </div>
+
+                                <div class="item">
+                                    <img src='@Url.Content("~/Images/Sliders/DGME.svg")' class="img-responsive" style="height: 200px;">
+                                </div>
+
+                                <div class="item">
+                                    <img src='@Url.Content("~/Images/Sliders/MIGOB.svg")' class="img-responsive" style="height: 200px;">
+                                </div>
+
+                                <div class="item">
+                                    <img src='@Url.Content("~/Images/Sliders/SPN.svg")' class="img-responsive" style="height: 200px;">
+                                </div>
+                            </div>
+                        </center>
+
+                        <!-- Controls -->
+                        <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev" style="z-index:-100">
+                            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next" style="z-index:-100">
+                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+
+
+                    <div id="message"></div>
+                </div>
+
+                <!--Informacion del ticket a llamar-->
+                @*<div class="col-md-12 col-lg-12 title" style="margin-top:25px; ">
+                    <center>
+                        <div id="Caller" class="col-md-12 col-lg-12">
+                            <div class="col-md-12 col-lg-12">
+                                <h1 style="font-size: 56px; font-family: 'CaviarDreams'; ">TURNO</h1>
+                            </div>
+                            <div class="col-md-12 col-lg-12">
+                                <h1 style="font-size: 64px; font-weight: bold; font-family: 'CaviarDreams'; " id="Turno_Actual">------</h1>
+                            </div>
+                            <div class="col-md-12 col-lg-12">
+                                <h1 style=" font-size: 56px; font-family: 'CaviarDreams'; " id="Estacion_Actual">------</h1>
+                            </div>
+                        </div>
+                    </center>
+                </div>*@
+
+
+
+                <!--Audio NO BORRAR para el timbre-->
+                <div id="jquery_jplayer_1" class="jp-jplayer"></div>
+                <div id="jp_container_1" class="jp-video jp-video-full" role="application" aria-label="media player">
+                    <div class="jp-type-single">
+                        <div class="jp-gui jp-interface">
+                            <div class="jp-controls">
+                                <button class="jp-play" role="button" tabindex="0">play</button>
+                                <button class="jp-stop" role="button" tabindex="0">stop</button>
+                            </div>
+                            <div class="jp-progress">
+                                <div class="jp-seek-bar">
+                                    <div class="jp-play-bar"></div>
+                                </div>
+                            </div>
+                            <div class="jp-volume-controls">
+                                <button class="jp-mute" role="button" tabindex="0">mute</button>
+                                <button class="jp-volume-max" role="button" tabindex="0">max volume</button>
+                                <div class="jp-volume-bar">
+                                    <div class="jp-volume-bar-value"></div>
+                                </div>
+                            </div>
+                            <div class="jp-time-holder">
+                                <div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>
+                                <div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>
+                                <div class="jp-toggles">
+                                    <button class="jp-repeat" role="button" tabindex="0">repeat</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!--Sonido del turno-->
+                <div id="jquery_jplayer_2" class="jp-jplayer"></div>
+                <div id="jp_container_2" class="jp-video jp-video-full" role="application" aria-label="media player">
+                    <div class="jp-type-single">
+                        <div class="jp-gui jp-interface">
+                            <div class="jp-controls">
+                                <button class="jp-play" role="button" tabindex="0">play</button>
+                                <button class="jp-stop" role="button" tabindex="0">stop</button>
+                            </div>
+                            <div class="jp-progress">
+                                <div class="jp-seek-bar">
+                                    <div class="jp-play-bar"></div>
+                                </div>
+                            </div>
+                            <div class="jp-volume-controls">
+                                <button class="jp-mute" role="button" tabindex="0">mute</button>
+                                <button class="jp-volume-max" role="button" tabindex="0">max volume</button>
+                                <div class="jp-volume-bar">
+                                    <div class="jp-volume-bar-value"></div>
+                                </div>
+                            </div>
+                            <div class="jp-time-holder">
+                                <div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>
+                                <div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>
+                                <div class="jp-toggles">
+                                    <button class="jp-repeat" role="button" tabindex="0">repeat</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--Sonido del estaciones-->
+                <div id="jquery_jplayer_3" class="jp-jplayer"></div>
+                <div id="jp_container_3" class="jp-video jp-video-full" role="application" aria-label="media player">
+                    <div class="jp-type-single">
+                        <div class="jp-gui jp-interface">
+                            <div class="jp-controls">
+                                <button class="jp-play" role="button" tabindex="0">play</button>
+                                <button class="jp-stop" role="button" tabindex="0">stop</button>
+                            </div>
+                            <div class="jp-progress">
+                                <div class="jp-seek-bar">
+                                    <div class="jp-play-bar"></div>
+                                </div>
+                            </div>
+                            <div class="jp-volume-controls">
+                                <button class="jp-mute" role="button" tabindex="0">mute</button>
+                                <button class="jp-volume-max" role="button" tabindex="0">max volume</button>
+                                <div class="jp-volume-bar">
+                                    <div class="jp-volume-bar-value"></div>
+                                </div>
+                            </div>
+                            <div class="jp-time-holder">
+                                <div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>
+                                <div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>
+                                <div class="jp-toggles">
+                                    <button class="jp-repeat" role="button" tabindex="0">repeat</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
+        </section>
+    </div>
+</section>
+
+<!--Color barra inferior-->
+<nav style="position: fixed; bottom: 0px; display: block; padding: 5px; background: #1B5E20; border: none; border-radius: 0px; margin: 0px; z-index: 100; width: 100%"></nav>
+
+
+<script>
+    //script que permite controlar el reloj
+    function show5() {
+        if (!document.layers && !document.all && !document.getElementById)
+            return
+
+        var Digital = new Date()
+        var hours = Digital.getHours()
+        var minutes = Digital.getMinutes()
+        var seconds = Digital.getSeconds()
+
+        var dn = "PM"
+        if (hours < 12)
+            dn = "AM"
+        if (hours > 12)
+            hours = hours - 12
+        if (hours == 0)
+            hours = 12
+
+        if (minutes <= 9)
+            minutes = "0" + minutes
+        if (seconds <= 9)
+            seconds = "0" + seconds
+        //
+        myclock = "<b>" + hours + ":" + minutes + ":"
+         + seconds + " " + dn + "</b>"
+        if (document.layers) {
+            document.layers.liveclock.document.write(myclock)
+            document.layers.liveclock.document.close()
+        }
+        else if (document.all)
+            liveclock.innerHTML = myclock
+        else if (document.getElementById)
+            document.getElementById("liveclock").innerHTML = myclock
+        setTimeout("show5()", 1000)
+    }
+
+    window.onload = show5
+
+    //-->
+</script>
+
+
+
+
+
+
+
+

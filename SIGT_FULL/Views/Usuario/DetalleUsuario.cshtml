@@ -1,0 +1,127 @@
+﻿@model CapaEntidad.Usuario
+
+@{
+    ViewBag.Title = "DetalleUsuario";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagActual"><a href="@Url.Action("ListaUsuario", "Usuario", new { usuario = Session["User"].ToString() })">Lista de usuarios</a></li>
+            <li class="PagActual">Editar de usuario</li>
+        </ol>
+    </section>
+</div>
+
+<div class="row contentype">
+    <section class="col-md-12" style="margin-bottom:25px">
+        <fieldset>
+            
+            <legend style="padding-bottom:5px">
+                <span class="pull-left"><strong>Detalle de la cuenta de @Model.NombreCompleto</strong></span>
+                <span class="pull-right">
+                    <a href="@Url.Action("EditarUsuario", "Usuario", new { usuario = Model.Cuenta })" class="btn btn-sm btn-warning" data-toggle="tooltip" data-placement="left" title="Editar usuario" style="margin-left:10px">
+                        Editar <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                    @if (Model.Estado == 1){
+                        <a href="@Url.Action("EditarUsuario", "Usuario", new { usuario = Model.Cuenta })" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="left" title="Baja usuario" style="margin-left:10px">
+                            Inhabilitar <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    }
+
+                    @if (Model.Estado == 0){
+                        <a href="@Url.Action("EditarUsuario", "Usuario", new { usuario = Model.Cuenta })" class="btn btn-sm btn-success" data-toggle="tooltip" data-placement="left" title="Alta usuario" style="margin-left:10px">
+                            Habilitar <span class="glyphicon glyphicon-ok"></span>
+                        </a>
+                    }
+                </span>
+                <span class="clearfix"></span>
+                <small>seleccione la acción a realizar</small>
+            </legend>
+
+            <form class="form-horizontal">
+                <div class="col-md-12" style="margin-top:15px">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Cuenta</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="usuario" value="@Model.Cuenta" readonly="readonly" style="background:#fff">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Contraseña</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="contrasena" value="@Model.Contrasena" readonly="readonly" style="background:#fff">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Perfil</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="contrasena" value="@Model.Perfil.NombrePerfil" readonly="readonly" style="background:#fff">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Estado</label>
+                            <div class="col-sm-9">
+                                @if (Model.Estado == 1)
+                                {
+                                    <input type="text" class="form-control" id="contrasena" value="Activo" readonly="readonly" style="background:#fff">
+                                }
+
+                                @if (Model.Estado == 0)
+                                {
+                                    <input type="text" class="form-control" id="contrasena" value="Inactivo" readonly="readonly" style="background:#fff">
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Caract.</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="usuario" value="@Model.Tipo.TipoUsuario" readonly="readonly" style="background:#fff">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Área</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="Area" value="@Model.Area.Descripcion" readonly="readonly" style="background:#fff">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Empleado</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="CodEmpleado" value="@Model.CodEmpleado" readonly="readonly" style="background:#fff">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Cédula de identidad</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="CodEmpleado" value="@Model.CedulaIdentidad" readonly="readonly" style="background:#fff">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">IP</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="contrasena" value="@Model.IP" readonly="readonly" style="background:#fff">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </form> 
+            
+        </fieldset>
+    </section>
+</div>
+
+
+

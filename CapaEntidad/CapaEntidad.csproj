@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8E5628CE-80A1-4F54-B228-9FB48CF5A65A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CapaEntidad</RootNamespace>
+    <AssemblyName>CapaEntidad</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Alertas\Alertas.cs" />
+    <Compile Include="Cliente\Cliente.cs" />
+    <Compile Include="Estaciones\Estacion.cs" />
+    <Compile Include="Estaciones\EstacionMotivos.cs" />
+    <Compile Include="Estaciones\EstacionTrabajo.cs" />
+    <Compile Include="Impresora.cs" />
+    <Compile Include="Otros\Institucion.cs" />
+    <Compile Include="Otros\Prioridad.cs" />
+    <Compile Include="Reportes\AreaRendimiento.cs" />
+    <Compile Include="Reportes\PivotePrestamo_Tiempo.cs" />
+    <Compile Include="Reportes\PivoteRecuperaciones_Tiempo.cs" />
+    <Compile Include="Reportes\PivoteRecuperaciones_Tickets.cs" />
+    <Compile Include="Reportes\PivotePrestamo_Tickets.cs" />
+    <Compile Include="Reportes\PivoteTicket_UsuarioHora.cs" />
+    <Compile Include="Reportes\PivotTicket_Atencion.cs" />
+    <Compile Include="Reportes\PivotTicket_AtencionUsuario.cs" />
+    <Compile Include="Reportes\TickestAreas.cs" />
+    <Compile Include="Reportes\TiempoAtencion_Usuario.cs" />
+    <Compile Include="Reportes\TiempoAtencion_Area.cs" />
+    <Compile Include="Reportes\UsuarioAtencionPromedio.cs" />
+    <Compile Include="Reportes\UsuarioAtencionTickets.cs" />
+    <Compile Include="Reportes\UsuarioRendimiento.cs" />
+    <Compile Include="Reportes\TicketsMensual.cs" />
+    <Compile Include="Reportes\UsuarioAtencionTiempo.cs" />
+    <Compile Include="Turno\Llamado.cs" />
+    <Compile Include="Turno\Motivo.cs" />
+    <Compile Include="Turno\Ticket.cs" />
+    <Compile Include="Reportes\PivotTicket_Areas.cs" />
+    <Compile Include="Usuario\UsuarioPermisos.cs" />
+    <Compile Include="Zona\Zona.cs" />
+    <Compile Include="Usuario\UsuarioControl.cs" />
+    <Compile Include="Usuario\UsuarioModulo.cs" />
+    <Compile Include="Usuario\Usuario.cs" />
+    <Compile Include="Usuario\UsuarioPerfil.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Monitor\Videos.cs" />
+    <Compile Include="Usuario\UsuarioTipo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

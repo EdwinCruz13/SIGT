@@ -1,0 +1,288 @@
+﻿@model IEnumerable<CapaEntidad.UsuarioPerfil>
+
+    @{
+        ViewBag.Title = "ListaPerfiles";
+        Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+    }
+
+
+   <script>
+    $(document).ready(function () {
+        $('.ListaPerfiles').DataTable({
+            "scroller": true,
+            "deferRender": true,
+            "lengthChange": false,
+            "pageLength": 25,
+            "bInfo": true,
+            "bFilter": true,
+            "bPaginate": true,
+            "paging": true,
+            "ordering": false,
+            "scrollY": "450px",
+            "scrollCollapse": true,
+            "fixedColumns": true,
+            language: {
+                "search": "Filtrar Por:",
+                "info": "Mostrando _TOTAL_ registros",
+                "lengthMenu": "Mostrar _MENU_ Registros",
+                "sZeroRecords": "NO HAY PERFILES",
+                "sInfoEmpty": "Upss! no hay registros XD",
+
+            },
+        });
+
+        //reparar los errores graficos entre el datatable y los tabs
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $($.fn.dataTable.tables(true)).DataTable()
+                .columns.adjust()
+                    .fixedColumns().relayout();
+        });
+    });
+
+
+    </script>
+
+
+    <div class="row contentype">
+        <section>
+            <ol class="breadcrumb">
+                <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+                <li class="PagActual">Lista de perfiles</li>
+            </ol>
+        </section>
+    </div>
+
+
+    <div id="DialogCharge" style="display:none">
+        <h4 id="MessageCharge"><strong>Cargando información...</strong></h4>
+    </div>
+
+
+    <div class="row contentype">
+        <section class="col-md-12">
+            <table class="table stripe compact row-border hover ListaPerfiles" cellspacing="0" width="98%">
+                <thead>
+                    <tr>
+                        <th class="text-center">
+                            <strong>Descripción</strong>
+                        </th>
+
+                        <th class="text-center">
+                            <strong>Fecha Creación</strong>
+                        </th>
+
+                        <th class="text-center">
+                            <strong>Usuario Graba</strong>
+                        </th>
+
+                        <th class="text-center">
+                            <strong>Estado</strong>
+                        </th>
+
+                        <th class="text-center">
+                            <strong>ACCIONES</strong>
+                        </th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            
+                            <td class="text-center">
+                                @Html.DisplayFor(modelItem => item.NombrePerfil)
+                            </td>
+
+                            <td class="text-center">
+                                @Html.DisplayFor(modelItem => item.FechaCreacion)
+                            </td>
+
+                            <td class="text-center">
+                                @Html.DisplayFor(modelItem => item.UsuarioGraba)
+                            </td>
+
+                            <td class="text-center">
+                                @Html.DisplayFor(modelItem => item.EstadoDescripcion)
+                            </td>
+
+
+                            <td class="text-center">
+
+                                <a href="#" class="btn btn-xs btn-info btn-Detalle" data-toggle="tooltip" data-placement="left" title="ver perfil" style="margin-left:10px" data-perfil="@item.IdPerfil" data-descripcion="@item.NombrePerfil">
+                                    <span class="glyphicon glyphicon-eye-open"></span> Detalle
+                                </a>
+
+                                <a href='@Url.Action("EditarPerfil", "Perfiles", new { idPerfil = item.IdPerfil })' class="btn btn-xs btn-warning btn-Editar" data-toggle="tooltip" data-placement="left" title="Editar perfil" style="margin-left:10px" data-perfil="@item.IdPerfil" data-descripcion="@item.NombrePerfil">
+                                    <span class="glyphicon glyphicon-pencil"></span> Editar
+                                </a>
+
+                                @if (item.Estado == true)
+                                {
+                                    <a href="#" class="btn btn-xs btn-danger btnEstado" data-toggle="tooltip" data-placement="left" title="Baja perfil" style="margin-left:10px" data-proceso="0" data-perfil="@item.IdPerfil">
+                                        <span class="glyphicon glyphicon-remove"></span> Inhabilitar 
+                                    </a>
+                                }
+
+                                @if (item.Estado == false)
+                                {
+                                    <a href="#" class="btn btn-xs btn-success btnEstado" data-toggle="tooltip" data-placement="left" title="Alta perfil" style="margin-left:10px" data-proceso="1" data-perfil="@item.IdPerfil">
+                                        <span class="glyphicon glyphicon-ok"></span> Habilitar 
+                                    </a>
+                                }
+                            </td>
+                            
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </section>
+    </div>
+
+
+
+<!--Modal para detallar perfiles de usuarios-->
+<div class="modal modal-open fade" id="Modal-PerfilCuenta" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title" style="color: #000"><strong>Información del perfil</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="col-md-4">IdPerfil</label>
+                    <input type="text" class="form-control col-md-8" id="IdPerfil" name="IdPerfil" readonly="readonly" style="max-width:100%">
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4">Descripción</label>
+                    <input type="text" class="form-control col-md-8" id="NombrePerfil" name="NombrePerfil" readonly="readonly" style="max-width:100%">
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4">Usuarios asignados</label>
+                    <select id="UsuariosAsignados" class="form-control col-md-8" multiple="multiple" style="max-width:100%; height:110px"></select>
+                    <div class="clearfix"></div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-md-4">Controles Asignados</label>
+                    <select id="ControlesAsignados" class="form-control col-md-8" multiple="multiple" style="max-width:100%; height:110px"></select>
+                    <div class="clearfix"></div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default pull-left" id="btnCerrar" data-dismiss="modal">Cerrar</a>
+                <a href="#" class="btn btn-warning pull-right" id="btnEditar" data-dismiss="modal">Editar</a>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>                          
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        var option;
+        var IdPerfil, Descripcion;
+        //si hace click en ver detalle
+        $(".btn-Detalle").click(function () {
+            //quitar los options de los select
+            $("option").remove();
+
+            IdPerfil = $(this).data("perfil");
+            Descripcion = $(this).data("descripcion");
+
+            //rellenar el formulario antes de abrir el modal
+            $("#IdPerfil").val(IdPerfil);
+            $("#NombrePerfil").val(Descripcion);
+
+
+            //usar ajax para obtener los datos del perfil
+            //concatenar dos vistas asincronas
+            $.ajax({
+                url: '@Url.Action("PermisosPerfil", "Perfiles")' + "?IdPerfil=" + IdPerfil + "&filtro=" + "Usuarios",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                beforeSend: function () {
+                    $("#DialogCharge").dialog({
+                        width: 300,
+                        height: 110,
+                        modal: true,
+                        show: "fadeIn",
+                        hide: "fadeOut",
+                        dragable: false
+                    });
+                },
+                //si existe respuesta, entonces rellenar el select $("#Zona")
+                success: function (response) {
+                    option = "";
+                    //recorrer el arreglo para presentar la lista de usuarios asignados
+                    if (response != "" || response != null || response.Usuario != null || response.Usuario.Cuenta != "") {
+                        $.each(response, function (key, value) {
+                            option += "<option value='" + value.Usuario.Cuenta + "'> " + value.Usuario.NombreCompleto + " </option>"
+                            $("#UsuariosAsignados").html(option);
+                        });
+                    }
+
+                    //agregar enlace
+                    $("#btnEditar").attr("href", '@Url.Action("EditarPerfil", "Perfiles")' + "?idPerfil=" + IdPerfil);
+                    
+                },
+                //si hay errores en la respuesta del json
+                error: function (xhr, ajaxOptions, thrownError) {
+                    option = "";
+                    $("#UsuariosAsignados option").remove();
+                }
+            });
+
+
+
+            //usar ajax para obtner los controles asignados al perfil
+            //usar ajax para obtener los datos del perfil
+            //concatenar dos vistas asincronas
+            $.ajax({
+                url: '@Url.Action("PermisosPerfil", "Perfiles")' + "?IdPerfil=" + IdPerfil + "&filtro=" + "Permisos",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                //si existe respuesta, entonces rellenar el select $("#Zona")
+                success: function (response) {
+                    option = "";
+                    //recorrer el arreglo para presentar la lista de usuarios asignados
+                    if (response != "" || response != null || response.Usuario != null || response.Usuario.Cuenta != "") {
+                        $.each(response, function (key, value) {
+                            option += "<option value='" + value.Actividad.CodActividad + "'> " + value.Actividad.DescripcionActividad + " </option>"
+                            $("#ControlesAsignados").html(option);
+                        });
+                    }
+
+                },
+                //si hay errores en la respuesta del json
+                error: function (xhr, ajaxOptions, thrownError) {
+                    $("#DialogCharge").dialog('close');
+                    option = "";
+                    $("#ControlesAsignados option").remove();
+
+                },
+                complete: function () {
+                    $("#DialogCharge").dialog('close');
+                    //abrir modal
+                    $("#Modal-PerfilCuenta").modal({
+                        show: "true",
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                }
+            });
+ 
+        });
+    });
+</script>

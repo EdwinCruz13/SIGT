@@ -1,0 +1,94 @@
+﻿<script>
+    $(document).ready(function () {
+        _TotalTicket_Mensual();
+
+        //script que permite crear el diagram lineal de los tickets atendidos mensualementes
+        function _TotalTicket_Mensual() {
+            Highcharts.chart('UsuarioHora', {
+                chart: {
+                    type: 'line',
+                    renderTo: 'containerMensual',
+                    defaultSeriesType: 'areaspline',
+                    height: 450
+                },
+                title: {
+                    text: 'Tickets atendido por: ' + '@ViewBag.Usuario'
+                },
+                subtitle: {
+                    text: 'Total de tickets del dia de hoy: ' + '@ViewBag.Total'
+                },
+                tooltip: {
+                    enabled: true,
+                    pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
+                },
+                xAxis: {
+                    categories: ['8am', '9am', '10am', '11am', '12md', '1pm', '2pm', '3pm', '4pm', '5pm']
+                },
+                yAxis: {
+                    title: {
+                        text: 'Total de Tickets'
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: true
+                    }
+                },
+
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                layout: 'horizontal',
+                                align: 'center',
+                                verticalAlign: 'bottom'
+                            }
+                        }
+                    }]
+                },
+
+                series: [{
+                    name: 'Hora del día',
+                    data: [@ViewBag._8, @ViewBag._9, @ViewBag._10, @ViewBag._11, @ViewBag._12, @ViewBag._13, @ViewBag._14, @ViewBag._15, @ViewBag._16, @ViewBag._17]
+                }]
+            });
+
+        };
+
+
+        //para resolver problemas con el tabs vs highchart
+        //si se activa el evento click del tab de boostrap
+        //recargar nuevamente el highchart
+        jQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) { // on tab selection event
+            jQuery("#UsuarioHora").each(function () {
+                var chart = jQuery(this).highcharts(); // target the chart itself
+                chart.reflow() // reflow that chart
+            });
+
+            
+        });
+
+
+    });
+
+
+
+</script>
+
+<figure class="highcharts-figure">
+    <div id="UsuarioHora"></div>
+    <p class="highcharts-description">
+        Total de tickets atendido el día de hoy.
+        <code>'@ViewBag.Usuario'</code> ha atendido '@ViewBag.Total' tickets
+    </p>
+</figure>
+<div id="UsuarioHora" class="col-md-12"></div>

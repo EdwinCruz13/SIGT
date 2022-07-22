@@ -1,0 +1,120 @@
+﻿@model CapaEntidad.Usuario
+
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="#">Usuario</a></li>
+            <li class="PagActual">Cuenta de usuario</li>
+        </ol>
+    </section>
+</div>
+
+
+
+<div class="row contentype">
+    <section class="col-md-12">
+        <article class="col-md-6" style="margin:0px; padding:0px">
+            <div class="col-md-12">
+                <h2>@Model.NombreCompleto</h2>
+            </div>
+            <div class="col-md-12">
+                <h5><span class="glyphicon glyphicon-book"></span> @Model.Cuenta / <a href="#">@Model.Perfil.NombrePerfil.ToUpper()</a></h5>
+            </div>
+        </article>
+        <article class="col-md-6" style="margin:0px; padding:0px">
+            <div class="col-md-12">
+                <h1 class="text-right" style="margin-top:30px">
+                    <a href="#" class="btn btn-default btn-lg" style="margin-left:25px; border-radius:50%"><span class="glyphicon glyphicon-user"></span></a>
+                    <a href="#" class="btn btn-default btn-lg" style="margin-left: 25px; border-radius: 50%"><span class="glyphicon glyphicon-list-alt"></span></a>
+                    <a href="#" class="btn btn-default btn-lg" style="margin-left: 25px; border-radius: 50%"><span class="glyphicon glyphicon-pencil"></span></a>
+                </h1>
+            </div>
+        </article>
+    </section>
+
+
+
+    <section class="col-md-12" style="margin-top: 25px;">
+        <!-- definir los tabs-->
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" class="active"><a href="#Reporte1" aria-controls="Reporte1" role="tab" data-toggle="tab" style="z-index:100;">Tickets del día</a></li>
+            <li role="presentation"><a href="#Reporte2" aria-controls="Reporte2" role="tab" data-toggle="tab" style="z-index:100">Horas de atención</a></li>
+            <li role="presentation"><a href="#Reporte3" aria-controls="Reporte3" role="tab" data-toggle="tab" style="z-index:100">Tickets del mes</a></li>
+            <li role="presentation"><a href="#Reporte4" aria-controls="Reporte4" role="tab" data-toggle="tab" style="z-index:100">Tickets por área</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <!--Tab 1-->
+            <div role="tabpanel" class="tab-pane active" id="Reporte1" style="margin-top:25px;">
+                <div class="col-md-12">
+
+                    <!--cargar la vista parcial de los tticket en generals-->
+                    <div class="col-md-4">
+                        @{ Html.RenderAction("_TotalTicket", "Reporte", new { ListaTicket = ViewBag.ListaTicket }); }
+                    </div>
+
+                    <!--cargar la vista parcial de los ticket atendids-->
+                    <div class="col-md-4">
+                        @{ Html.RenderAction("_TotalTicket_Atendidos", "Reporte", new { ListaTicket = ViewBag.ListaTicket }); }
+                    </div>
+
+                    <!--cargar la vista parcial de los ticket existente vs total del dia-->
+                    <div class="col-md-4">
+                        @{Html.RenderAction("_TotalDia_Usuario", "Reporte", new { ListaTicket = ViewBag.ListaTicket });}
+                    </div>
+                </div>
+
+                <br />
+                <div class="col-md-12" style="margin-top:50px">
+                    <!--load partial view with the tickets time*user-->
+                    <div class="col-md-12">
+                        @{Html.RenderAction("_TotalTicket_UsuarioHora", "Reporte");}
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+
+
+
+            <!--Tab 2-->
+            <div role="tabpanel" class="tab-pane" id="Reporte2" style="margin-top:25px; z-index:-100">
+                <div class="col-md-12">
+                    @{Html.RenderAction("_TotalTicket_AreaHora", "Reporte");}
+                </div>
+            </div>
+
+
+            <!--Tab 3-->
+            <div role="tabpanel" class="tab-pane" id="Reporte3" style="margin-top:25px; z-index:-100">
+                <div class="col-md-12">
+                    @{Html.RenderAction("_TotalTicket_Mensual", "Reporte");}
+                </div>
+            </div>
+
+
+            <!--Tab 4-->
+            <div role="tabpanel" class="tab-pane" id="Reporte4" style="margin-top:25px; z-index:-100">
+                <div class="col-md-12">
+                    @{Html.RenderAction("_TotalTicket_MensualArea", "Reporte");}
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+</div>
+
+

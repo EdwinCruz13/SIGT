@@ -1,0 +1,6 @@
+﻿@model CapaReportes.Ticket
+
+
+@Html.DevExpress().WebDocumentViewer(settings =>{
+       settings.Name = "rptTicket";
+   }).Bind(Model).GetHtml()

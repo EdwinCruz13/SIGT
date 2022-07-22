@@ -1,0 +1,256 @@
+﻿
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagActual">Reporte general</li>
+        </ol>
+    </section>
+</div>
+
+
+
+<!--Reporte-->
+<div class="row contentype" style="padding:0; ">
+    <section class="col-md-12">
+        <div class="nav navbar-nav navbar-left">
+            <form class="navbar-form navbar-left">
+
+                <div class="form-group">
+                    <div class="pull-right">
+                        <h4 style="margin-top:0.5rem"><b>Mostrar Información</b></h4>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="form-group" style="margin-left:0.5rem">
+                    <div class="pull-right">
+                        <input type="text" id="FechaInicio" class="form-control datepicker" placeholder="Fecha de inicio">
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+
+                <div class="form-group" style="margin-left:0.5rem">
+                    <div class="pull-right">
+                        <input type="text" id="FechaFin" class="form-control datepicker" placeholder="Fecha Fin">
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="form-group" style="margin-left:0.5rem">
+                    @{ Html.RenderAction("_ListaUsuarios", "Reporte"); }
+                </div>
+
+
+
+                <div class="form-group" style="margin-left:0.5rem">
+                    <div class="dropdown pull-right">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <span href="#" id='filter' data-name="Rendimiento" data-filter='Rendimiento' data-glyph="glyphicon glyphicon-time"><i class="glyphicon glyphicon-time"></i> Rendimiento</span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu user" aria-labelledby="dropdownMenu1">
+                            <li style='font-size:13px'><a href="#" class='item-filter' data-name="Rendimiento" data-filter='Rendimiento' data-glyph="glyphicon glyphicon-time"><i class="glyphicon glyphicon-time"></i> Rendimiento</a></li>
+                            <li style='font-size:13px'><a href="#" class='item-filter' data-name="Tipo de visitas" data-filter='TotalPorVisita' data-glyph="glyphicon glyphicon-adjust"><i class="glyphicon glyphicon-adjust"></i> Tipo de visitas</a></li>
+                            <li style='font-size:13px'><a href="#" class='item-filter' data-name="Total de tickets" data-filter='TotalTickets' data-glyph="glyphicon glyphicon-signal"><i class="glyphicon glyphicon-signal"></i> Total de tickets</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="form-group" style="margin-left:0.5rem">
+                    <div class="pull-right">
+                        <a href="#" class="btn btn-primary btn-filter" style="width:7rem"><i class="glyphicon glyphicon-filter"></i> Filtrar</a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+            </form>
+
+        </div>
+    </section>
+
+    <section class="col-md-12">
+        <div class="card">
+            <div class="card-header" style="background:#fff; padding:0.8rem 0.5rem">
+                <h3 style="color:#1976d2"><b>Informe de <span class="user_name" data-id="JDAVILA">Jessica Dávila</span></b></h3>
+            </div>
+
+            <div class="card-body" style="background:#fff; padding:1.7rem 0">
+                <!--area de reporte de usuarios-->
+                <div id="ReporteUsuario" class="col-md-6" style="padding:0; border-left:solid 1px #d1d0d0; margin-top:-1.7rem">
+                    @{ Html.RenderAction("_Rendimiento", "Reporte", new { filtro = "Usuario", busqueda = ViewBag.usuario, fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+
+
+                <div class="col-md-6" style="padding:0; margin-top:-1.7rem; border-left:solid 1px #d1d0d0;">
+                    <ul class="nav nav-pills" role="tablist">
+                        <li role="presentation" class="active"><a href="#Reporte1" aria-controls="Reporte1" role="tab" data-toggle="tab" style="z-index:100;"><h5>Total de tickets</h5></a></li>
+                        <li role="presentation"><a href="#Reporte2" aria-controls="Reporte2" role="tab" data-toggle="tab" style="z-index:100"><h5>Tiempos de atención</h5></a></li>
+                        <li role="presentation"><a href="#Reporte3" aria-controls="Reporte3" role="tab" data-toggle="tab" style="z-index:100"><h5>Distribución de tickets</h5></a></li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <!--Tab 1-->
+                        <div role="tabpanel" class="tab-pane active" id="Reporte1" style="margin-top:25px; height:400px">
+                            @{ Html.RenderAction("_TicketsUsuario", "Reporte", new { usuario = ViewBag.usuario, fi = ViewBag.fi, ff = ViewBag.ff }); }
+                        </div>
+
+                        <!--Tab 2-->
+                        <div role="tabpanel" class="tab-pane" id="Reporte2" style="margin-top:25px; z-index:-100">
+
+                        </div>
+
+
+                        <!--Tab 3-->
+                        <div role="tabpanel" class="tab-pane" id="Reporte3" style="margin-top:25px; z-index:-100">
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+
+    <section class="col-md-12" style="margin-top:0rem">
+        <div class="card">
+            <div class="card-header" style="background:#fff; padding:0.8rem 0.5rem">
+                <h3 class="text-center" style="color:#1976d2"><b>Reporte por áreas</b></h3>
+                <div id="ResumenPrestamos" class="col-md-6">
+                    @{ Html.RenderAction("_GeneralTickets", "Reporte", new { idarea = "01", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+
+                <div id="ResumenRecuperaciones" class="col-md-6" style="border-left:solid 1px #d1d0d0">
+                    @{ Html.RenderAction("_GeneralTickets", "Reporte", new { idarea = "02", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+
+            </div>
+
+            <div class="card-body" style="background:#fff; padding:1.7rem 0">
+                <!--area de reporte de préstamo-->
+                <div id="ReportePrestamo" class="col-md-6" style="padding:0; margin-top: -1.7rem;">
+                    @{ Html.RenderAction("_Rendimiento", "Reporte", new { filtro = "Area", busqueda = "01", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+
+                <!--area de reporte de recuperaciones-->
+                <div id="ReporteRecuperaciones" class="col-md-6" style="padding:0; border-left:solid 1px #d1d0d0; margin-top: -1.7rem;">
+                    @{ Html.RenderAction("_Rendimiento", "Reporte", new { filtro = "Area", busqueda = "02", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+</div>
+
+
+<script>
+    var itemReport = $(".filter").data('filter');
+    var nombreuser, id, type;
+
+    //Declarar variables principales para el formato de fecha
+    var FechaInicio
+    var FechaFin;
+
+    //obtener el mes actuales
+    var month = (new Date().getMonth() + 1 < 10) ? '0' + new Date().getMonth() + 1 : new Date().getMonth() + 1;
+    var year = new Date().getFullYear();
+    var LastTime = new Date(year, month, 0);
+    var day = (LastTime.getDate() < 10) ? '0' + LastTime.getDate() : LastTime.getDate();
+
+    FechaInicio = "01/" + month + "/" + year;
+    FechaFin = day + "/" + month + "/" + year;
+
+    $("#FechaInicio").datepicker();
+    $("#FechaFin").datepicker();
+    $("#FechaInicio").datepicker("option", "dateFormat", "dd/mm/yy");
+    $("#FechaFin").datepicker("option", "dateFormat", "dd/mm/yy");
+
+    $("#FechaInicio").val(FechaInicio);
+    $("#FechaFin").val(FechaFin);
+
+
+    //variables para busqueda de usuarios para el componente Id: filter
+    var FiltroR, FilterN, Glyph;
+
+    //evento click para detectar el tipo de filtro
+    $(".item-filter").click(function () {
+        $("#filter").remove("i");
+        FiltroR = $(this).data("filter");
+        Glyph = $(this).data("glyph");
+        FilterN = $(this).data("name");
+
+        $("#filter").attr("data-filter", FiltroR);
+        $("#filter").attr("data-glyph", Glyph);
+        $("#filter").attr("data-name", FilterN);
+        $("#filter").html("<i class='" + Glyph + "'></i> " + FilterN);
+    });
+
+    //evento de seleccion de usuario
+    $(".user-filter").click(function () {
+        id = $(this).data("id");
+        nombreuser = $(this).data("name");
+        type = $(this).data("filter");
+
+        $("#selected-user").attr("data-id", id);
+        $("#selected-user").attr("data-name", nombreuser);
+        $("#selected-user").attr("data-filter", type);
+        $("#selected-user").html(nombreuser);
+
+    });
+
+    //evento click para detectar tipo de filtro
+    //y cargar los reportes en base a la selección
+    $(".btn-filter").click(function () {
+        
+        //capturar la fechas para filtros
+        FechaInicio = $("#FechaInicio").val();
+        FechaFin = $("#FechaFin").val();
+
+        //obtener el reporte seleccionado
+        itemReport = $("#filter").data('filter');
+        
+        //cargar el tipo de reporte
+        switch (itemReport) {
+
+            //cargar la vista parcial en base al reporte
+            case "Rendimiento":
+                //reporte general
+                $('#ResumenPrestamos').load("/Reporte/_GeneralTickets?idarea=01&fi=" + FechaInicio + "&ff=" + FechaFin);
+                $('#ResumenRecuperaciones').load("/Reporte/_GeneralTickets?idarea=02&fi=" + FechaInicio + "&ff=" + FechaFin);
+
+                //reporte por area
+                $('#ReportePrestamo').load("/Reporte/_Rendimiento?filtro=Area&busqueda=01&fi=" + FechaInicio + "&ff=" + FechaFin);
+                $('#ReporteRecuperaciones').load("/Reporte/_Rendimiento?filtro=Area&busqueda=02&fi=" + FechaInicio + "&ff=" + FechaFin);
+
+                //reporte por usuario
+                $(".user_name").html(nombreuser);
+                $('#ReporteUsuario').load("/Reporte/_Rendimiento?filtro=Usuario&busqueda=" + id + "&fi=" + FechaInicio + "&ff=" + FechaFin);
+                $('#Reporte1').load("/Reporte/_TicketsUsuario?usuario=" + id + "&fi=" + FechaInicio + "&ff=" + FechaFin);
+
+                
+            break;
+        }
+
+        //adjustar tamaño
+        $("#LinearGraph .highcharts-container ").css("height", "400px");
+    });
+
+
+
+</script>

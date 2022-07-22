@@ -1,0 +1,78 @@
+﻿<script>
+    $(document).ready(function () {
+        _TotalTicket_Mensual();
+
+        //script que permite crear el diagram lineal de los tickets atendidos mensualementes
+        function _TotalTicket_Mensual() {
+            Highcharts.chart('containerMensualArea', {
+                chart: {
+                    type: 'line',
+                    renderTo: 'containerMensual',
+                    defaultSeriesType: 'areaspline',
+                    height: 450
+                },
+                title: {
+                    text: 'Valoración de tickets atendidos'
+                },
+                subtitle: {
+                    text: 'Total de tickets Mensuales del año ' + '@ViewBag.TotalMensual.Anno'
+                },
+                tooltip: {
+                    enabled: true,
+                    pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
+                },
+                xAxis: {
+                    categories: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+                },
+                yAxis: {
+                    title: {
+                        text: 'Números de tickets'
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: true
+                    }
+                },
+
+                series: [{
+                    name: 'Total de Tickets en préstamo',
+                    data: [@ViewBag.TotalPrestamo.Enero, @ViewBag.TotalPrestamo.Febrero, @ViewBag.TotalPrestamo.Marzo, @ViewBag.TotalPrestamo.Abril, @ViewBag.TotalPrestamo.Mayo, @ViewBag.TotalPrestamo.Junio, @ViewBag.TotalPrestamo.Julio, @ViewBag.TotalPrestamo.Agosto, @ViewBag.TotalPrestamo.Septiembre, @ViewBag.TotalPrestamo.Octubre, @ViewBag.TotalPrestamo.Noviembre, @ViewBag.TotalPrestamo.Diciembre]
+                }, {
+                    name: 'Total de Tickets en Recuperaciones',
+                    data: [@ViewBag.TotalRecuperaciones.Enero, @ViewBag.TotalRecuperaciones.Febrero, @ViewBag.TotalRecuperaciones.Marzo, @ViewBag.TotalRecuperaciones.Abril, @ViewBag.TotalRecuperaciones.Mayo, @ViewBag.TotalRecuperaciones.Junio, @ViewBag.TotalRecuperaciones.Julio, @ViewBag.TotalRecuperaciones.Agosto, @ViewBag.TotalRecuperaciones.Septiembre, @ViewBag.TotalRecuperaciones.Octubre, @ViewBag.TotalRecuperaciones.Noviembre, @ViewBag.TotalRecuperaciones.Diciembre]
+
+                }]
+            });
+
+        };
+
+
+        //para resolver problemas con el tabs vs highchart
+        //si se activa el evento click del tab de boostrap
+        //recargar nuevamente el highchart
+        //para resolver problemas con el tabs vs highchart
+        //si se activa el evento click del tab de boostrap
+        //recargar nuevamente el highchart
+        jQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) { // on tab selection event
+            jQuery("#containerMensualArea").each(function () {
+                var chart = jQuery(this).highcharts(); // target the chart itself
+                chart.reflow() // reflow that chart
+            });
+        });
+
+
+    });
+
+
+    
+</script>
+
+
+<div id="containerMensualArea" style="z-index:-10; max-width:100%"></div>

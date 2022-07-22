@@ -1,0 +1,14 @@
+﻿@model CapaReportes.Ticket
+
+@Html.DevExpress().DocumentViewer(settings =>
+{
+    settings.Name = "Report";
+    settings.CallbackRouteValues = new { Controller = "Expendedor", Action = "_Ticket", Ticket = ViewBag.CodTicket };
+    settings.ExportRouteValues = new { Controller = "Expendedor", Action = "ReportPartialExport", Ticket = ViewBag.CodTicket };
+    settings.Report = (XtraReport)Model;
+    settings.Height = 400;
+    settings.ToolbarMode = DocumentViewerToolbarMode.ExternalRibbon;
+    settings.AssociatedRibbonName = "Ribbon";
+
+
+}).GetHtml()

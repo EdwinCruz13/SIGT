@@ -1,0 +1,8 @@
+FUENTE EN MEJORA AL 18 DE MAYO DEL 2018
+SE AGREGA:
+
+La vista de expendedor de tickets para el kiosko
+Nuevo metodo en el controlador para detectar el kiosko, pantalla y usuarios
+Cambios en el registro de tickets (CapaNegocio, Vista, metodo controlador)
+Cambios en el Spr_RegistrarTickets
+

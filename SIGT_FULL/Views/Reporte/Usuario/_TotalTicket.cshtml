@@ -1,0 +1,85 @@
+﻿<script>
+     
+    //script que permite crear el diagram de ticket totales vs atendidos
+    //guardar en contadores el monto total de ticket y los ticket atendidos
+    $(document).ready(function () {
+        _TotalTicket_General();
+        function _TotalTicket_General() {
+            //usar las siguientes ecuaciones para determinar
+            //los valores a utilizar en las graficas (validar si existe cocientes 0)
+            VPrestamo = ('@ViewBag.TicketDia' == 0) ? 0 : (('@ViewBag.Prestamos') / ('@ViewBag.TicketDia')) * 100;
+            VRecuperaciones = ('@ViewBag.TicketDia' == 0) ? 0 : (('@ViewBag.Recuperaciones' / ('@ViewBag.TicketDia'))) * 100;
+
+
+            //dibujar el diagrama circular en el div container3
+            Highcharts.chart('container3', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    backgroundColor: 'rgba(255, 255, 255, 0.0)',
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Total de Tickets creados' 
+                },
+                subtitle: {
+                    style: {
+                        fontSize: '11px'
+                    },
+                    text: 'Total de Ticket = ' + '@ViewBag.TicketDia' + "<br>Tickets Préstamos = " + '@ViewBag.Prestamos' + "<br>Tickets Recuperaciones  = " + '@ViewBag.Recuperaciones'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                credits: {
+                    enabled: false
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        size: "70%",
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                            },
+                            connectorColor: 'silver'
+                        },
+                        showInLegend: true
+                    }
+                },
+                //colors: ['#827717', '#01579b'],
+                series: [{
+                    name: 'Reporte 1',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'Recuperaciones',
+                        y: VRecuperaciones,
+                        sliced: true,
+                        selected: true
+
+                    }, {
+                        name: 'Préstamos',
+                        y: VPrestamo 
+                    }]
+                }]
+            });
+
+        };
+
+
+        jQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) { // on tab selection event
+            jQuery("#container3").each(function () {
+                var chart = jQuery(this).highcharts(); // target the chart itself
+                chart.reflow() // reflow that chart
+            });
+        });
+
+    });
+</script>
+
+
+<div id="container3" style="z-index:-10"></div>

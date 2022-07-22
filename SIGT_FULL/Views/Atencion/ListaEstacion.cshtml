@@ -1,0 +1,456 @@
+﻿@model IEnumerable<CapaEntidad.Estacion>
+
+@{
+    ViewBag.Title = "ListaEstacion";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+
+
+
+<!--Agregar la referencia del hubs, el buscara todos los hub existente usando AppStart de la aplicacion-->
+<script src="@Url.Content("~/signalr/hubs")"></script>
+
+<script>
+    //script que permite seleccionar la estacion a
+    //a activar/inactivar
+    $(document).ready(function () {
+        //obtener la informacion de la estacion
+        var estado, id, nombre, ip, usuario;
+        var flagExiste_turno;
+
+        //Crear la referencia al hub estaciones (usar minuscula camillada a la clase)
+        //para detectar usuarios en la estación y realizar
+        //acciones sobre ella
+        var Estacionhub = $.connection.estacionHub;
+        $.connection.hub.start().done(function () {
+            //añadir comportamiento con eventos jquery
+            Estacionhub.server.conectar('@Session["User"].ToString()', '@Session["IP"].ToString()', false);
+        });
+        Estacionhub.client.conectados = function (EstacionesActivas) {
+            $(".UsuarioA").html("------");
+            $.each(EstacionesActivas, function (index, estacion) {
+                //recorrer los cardView obteniendo el data-id
+                $(".cardView").each(function () {
+                    if ($(this).data('id') == estacion.CodEstacion && estacion.Estado >= -1) {
+                        $(this).find(".UsuarioA").html("<span class='badge' style='margin-top:-5px; background: #388E3C; padding: 1px; display: inline-block; border-radius: 50%; width: 10px; height: 10px; '></span> " + estacion.Usuario.Cuenta);
+                    }
+                });
+
+            });
+        };
+        //verificar si existe turno usando signalR
+        Estacionhub.client.flagtickets = function (flag) {
+            flagExiste_turno = flag;
+        };
+
+        
+        //Crear la referencia al hub alertas (usar minuscula camillada a la clase)
+        //si existe respuesta del hub AlertasHub
+        //que son mensajes provenientes de las estaciones
+        //para solicitar cierrer
+        var hub2 = $.connection.alertasHub;
+        hub2.client.listaMensajes = function (ListaAlertas) {
+            //Eliminar todos los componentes dentro del panel
+            $(".itemNotificaciones").remove();
+
+            //recorrer la lista
+            $.each(ListaAlertas, function (index, alertas) {
+                //formato de fecha y hora
+                var fecha = new Date(alertas.Fecha);
+                var hora = fecha.toLocaleString('es-ES', { hour: 'numeric', minute: 'numeric', hour12: true }).toLowerCase();
+
+                //alert(alertas.EstacionTrabajo.Usuario.NombreCompleto);
+                //solo listar las de la zona correspondiente
+                if(alertas.EstacionTrabajo.Turno.Motivo.Zona.IdZona == '@Session["Zone"].ToString()' ){
+                    var componente = "<div class='media itemNotificaciones'><div class='media-left'><a href='#'><img class='media-object' src='@Url.Content("~/Images/Icons/UserDown.png")' width='30' height='30' /></a></div><div class='media-body'><h6 class='media-heading'><a href='#' class='fechaNotifica' style='font-weight:bold'>" + hora + "</a> <span class='usuarioNotifica' style='font-weight:bold'>" + alertas.EstacionTrabajo.Usuario.NombreCompleto + " </span> en el <span class='EstacionNotifica'>" + alertas.EstacionTrabajo.NombreEstacion + "</span> ha solicitado cierre de estación. </h6></div></div>";
+                    $("#ListaNotificaciones").append(componente);
+                }
+
+                console.log(alertas)
+
+            });
+        };
+
+
+
+        //evento click para la realizacion
+        //para activar el modal que permita
+        //detectar la accion a realizar
+        $(".onProccess").click(function () {
+            $("#AlertaCierre").html("");
+
+            //inicializar variables
+            estado = $(this).data('conectado'); id = $(this).data('estacion');
+            nombre = $(this).data('nombre'); ip = $(this).data('ip');
+            usuario = $(this).data('usuario');
+
+            //si va activar la estacion
+            if (estado == "false" || estado == false) {
+                PrepararEncenderEstacion(usuario, nombre, ip);
+            }
+
+            //si va desactivar la estacion
+            if (estado == "true" || estado == true) {
+                PrepararApagarEstacion(usuario, nombre, ip);
+            }
+
+            //abrir modal
+            $("#Modal-ActivarEstacion").modal({
+                show: "true",
+                backdrop: 'static',
+                keyboard: false
+            });
+
+        });
+
+        //evento para detectar accion a realizar sobre estacion
+        //activar o desactivar
+        $(".MbtnAtencion").click(function () {
+            //si va a activar la estacion
+            if (estado == "false" || estado == false) {
+                //validar si existe turno, ir al metodo ValidarActivacion en el hub EstacionHub 
+                Estacionhub.server.validarActivacion().done(function (Message) {
+                    if (Message == true) {
+                        ActivarEstacion();
+                        //recargar página
+                        setTimeout(function () {
+                            window.location.href = '@Url.Action("ListaEstacion", "Atencion")' + "?usuario=" + '@Session["User"].ToString()';
+                        }, 1000);
+                    //si no hau turno, entonces mostrar el modal
+                    } else {
+                        $('#Modal-ActivarEstacion').modal('hide');
+                        //abrir modal
+                        $("#Modal-AdvertenciaEstacion").modal({
+                            show: "true",
+                            backdrop: 'static',
+                            keyboard: false
+                        });
+                    }
+                }); 
+
+            }
+
+            //si va desactivar la estacion
+            if (estado == "true" || estado == true) {
+                //Verificar si la estacion esta ocupada atendiendo algún cliente
+                Estacionhub.server.validarCierre(usuario, ip).done(function (Message) {
+                    if (Message == true) {
+                        DesactivarEstacion();
+                        //recargar página despues de 10s
+                        setTimeout(function () {
+                            window.location.href = '@Url.Action("ListaEstacion", "Atencion")' + "?usuario=" + '@Session["User"].ToString()';
+                        }, 1000);
+                    }
+                    //si se encuentra atendiendo
+                    else {
+                        $("#AlertaCierre").html("<strong>NO PUEDE CERRAR ESTA ESTACIÓN DEBIDO A QUE ACTUALMENTE SE ENCUENTRA ATENDIENDO AL CLIENTE</strong>");
+                    }
+                });    
+            }
+        });
+
+        //conectarse al hub, funcion conectar estacion
+        //el resultado se visualizará en la pantalla de las
+        //estaciones
+        function ActivarEstacion() {
+            Estacionhub.server.activar(usuario, ip);
+
+        }
+
+        //conectarse al hub, funcion desconectar estacion
+        //el resultado se visualizará en la pantalla de las
+        //estaciones
+        function DesactivarEstacion() {
+            Estacionhub.server.desactivar(usuario, ip);
+        }
+
+
+        //funcion que permite encender la estacion
+        //activara los botones necesario y asignará los ticket a las estacion
+        function PrepararEncenderEstacion(usuario, nombre, ip) {
+            //agregar texto al boton
+            $(".txt-Activacion").html("Activar");
+            $(".txt-Accion").html("Activar estación");
+            $(".txt-Escritorio").html(nombre);
+            $(".txt-IP").html(ip);
+            $(".MbtnAtencion").html("Asig. automática");
+
+            $(".text-info").html("<p style='margin-top:10px'>Seleccione el tipo de asignación de ticket a la estación de trabajo correspondiente.</p>");
+
+
+            //remover tipo de boton
+            $(".MbtnAtencion").removeClass("btn-danger");
+            $(".MbtnAtencion").addClass("btn-success");
+
+            //agregar estados a los botones del cardview interno
+            $(".btnNotifie1").html("<strong>INACTIVA</strong>");
+            $(".btnNotifie1").addClass("btn-danger");
+            $(".btnNotifie1").removeClass("btn-success");
+
+            $(".btnNotifie2").html("<strong>ACTIVA</strong>");
+            $(".btnNotifie2").removeClass("btn-danger");
+            $(".btnNotifie2").addClass("btn-success");
+
+            $("#MbtnAsignar_Manual").prop("disabled", false);
+
+        }
+
+        //funcion que permite apagar la estacion
+        //desactivara los botones y detendra la asignacion de ticket
+        function PrepararApagarEstacion(usuario, nombre, ip) {
+            //agregar texto al boton
+            $(".txt-Activacion").html("Desactivar");
+            $(".txt-Accion").html("Desactivar estación");
+            $(".txt-Escritorio").html(nombre);
+            $(".txt-IP").html(ip);
+            $(".MbtnAtencion").html("Desactivar estación");
+
+            //remover tipo de boton
+            $(".MbtnAtencion").addClass("btn-danger");
+            $(".MbtnAtencion").removeClass("btn-success");
+
+            //agregar estados a los botones del cardview interno
+            $(".btnNotifie1").html("<strong>ACTIVA</strong>");
+            $(".btnNotifie1").removeClass("btn-danger");
+            $(".btnNotifie1").addClass("btn-success");
+            $(".btnNotifie2").html("<strong>INACTIVA</strong>");
+            $(".btnNotifie2").addClass("btn-danger");
+            $(".btnNotifie2").removeClass("btn-success");
+
+            $("#MbtnAsignar_Manual").prop("disabled", true);
+
+        }
+    });
+</script>
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagActual">Lista de estaciones de @Model.First().Area.Descripcion</li>
+        </ol>
+    </section>
+</div>
+
+
+
+<div class="row contentype">
+    <section class="col-md-8" style="padding:0px 5px">
+        <div class="ListE">
+            <div class="panel-group">
+                <!--Panel-->
+                <div class="panel panel-default" style="border-radius:0px">
+                    <div class="panel-body">
+                        @foreach (var item in Model)
+                        {
+                            <!--CardView-->
+                            <div class="col-sm-4 col-md-3 col-lg-3 cardView" style="margin:10px 0px; height:10%;" data-id="@item.IdEstacion">
+                                <div class="panel panel-info" style="border:solid 1px #808080;">
+                                    <div class="panel-body">
+                                        <div class="col-xs-12 col-md-4" style="margin:0px; padding:0px">
+                                            <div class="">
+                                                <center><img class="text-center" src="@Url.Content("~/Images/Icons/estacion.png")" width="30" height="30" /></center>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-8" style="margin:0px; padding:0px">
+                                            <div style="margin-left:5px">
+                                                <h6 class="text-center" style="color:#1565c0"><strong>@item.NombreEstacion</strong></h6>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-12" style="margin:0px; padding:initial">
+                                            <h6 style="text-align:center; font-weight:bold" class="UsuarioA"> @item.UsuarioP</h6>
+                                            
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                            <h6 class="text-center"><strong>@item.IpLocal</strong></h6>
+                                            <center>
+                                                @if (item.Estado == "ACTIVA")
+                                                {
+                                                    <a href="#" class="btn btn-success btn-sm onProccess" data-conectado="true" data-estacion="@item.IdEstacion" data-nombre="@item.NombreEstacion" data-ip="@item.IpLocal" data-usuario="@item.UsuarioP">
+                                                        <strong>@item.Estado</strong>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#" class="btn btn-danger btn-sm onProccess" data-conectado="false" data-estacion="@item.IdEstacion" data-nombre="@item.NombreEstacion" data-ip="@item.IpLocal" data-usuario="@item.UsuarioP">
+                                                        <strong>@item.Estado</strong>
+                                                    </a>
+                                                }
+                                            </center>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!--CardView-->
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="col-md-4" style="padding:0px 5px">
+        <div class="Message">
+            <div class="panel-group">
+                @{
+                    //cargar la vista parcial
+                    Html.RenderAction("_ListaNotificaciones", "Atencion");
+                }
+            </div>
+        </div>
+        <p class="help-block text-right">Cada una de los mensajes son de la fecha actual.</p>
+    </section>
+</div>
+
+
+
+<!--Modal de advertencia de activación de estacion-->
+<div class="modal modal-open fade" id="Modal-ActivarEstacion" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong><span class="txt-Accion"></span></strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h4 class="text-justify"><strong>Se procederá a <span class="txt-Activacion"></span> la estación de trabajo del <span class="txt-Escritorio"></span>. <span class="text-info"></span></strong></h4>
+                    </div>
+
+                    @*<div class="col-sm-12">
+                        <!--CardView-->
+                        <div class="col-md-4 col-lg-4" style="margin-top:10px">
+                            <div class="panel panel-info" style="border:solid 1px #808080">
+                                <div class="panel-body">
+                                    <div class="col-xs-12 col-md-4" style="margin:0px; padding:0px">
+                                        <div class="">
+                                            <center><img class="text-center" src="@Url.Content("~/Images/Icons/estacion.png")" width="40" height="40" /></center>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                    <div class="col-xs-12 col-md-8" style="margin:0px; padding:0px">
+                                        <div style="margin-left:5px">
+                                            <h6 class="text-center" style="color:#1565c0"><strong><span class="txt-Escritorio"></span></strong></h6>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                    <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                        <h6 style="text-align:center; font-weight:bold" class="UsuarioA">-----------</h6>
+                                    </div>
+
+                                    <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                        <h6 class="text-center"><strong><span class="txt-IP"></span></strong></h6>
+                                        <center>
+                                            <a href="#" class="btn btn-success btn-sm btnNotifie1"></a>                                              
+                                        </center>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--CardView-->
+
+                        <!--CardView-->
+                        <div class="col-md-4 col-lg-4" style="margin-top:10px">
+                            <span style="position:absolute; margin-top:35%"><a href="#"><strong>---------------------------------></strong></a></span>
+                        </div>
+                        <!--CardView-->
+
+
+                        <!--CardView-->
+                        <div class="col-md-4 col-lg-4" style="margin-top:10px">
+                            <div class="panel panel-info" style="border:solid 1px #808080">
+                                <div class="panel-body">
+                                    <div class="col-xs-12 col-md-4" style="margin:0px; padding:0px">
+                                        <div class="">
+                                            <center><img class="text-center" src="@Url.Content("~/Images/Icons/estacion.png")" width="40" height="40" /></center>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                    <div class="col-xs-12 col-md-8" style="margin:0px; padding:0px">
+                                        <div style="margin-left:5px">
+                                            <h6 class="text-center" style="color:#1565c0"><strong><span class="txt-Escritorio"></span></strong></h6>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                    <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                        <h6 style="text-align:center" class="UsuarioA">----------</h6>
+                                    </div>
+
+                                    <div class="col-xs-12 col-md-12" style="margin:0px; padding:0px">
+                                        <h6 class="text-center"><strong><span class="txt-IP"></span></strong></h6>
+                                        <center>
+                                            <a href="#" class="btn btn-success btn-sm btnNotifie2"></a>
+                                        </center>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--CardView-->
+                    </div>*@
+
+
+
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <h4 id="MessageError_Validate" style="color:#a84646"></h4>
+                <div class="col-md-4 text-center">
+                    <a href="#" class="btn btn-default" id="MbtnCerrar" data-dismiss="modal">Cerrar ventana</a>
+                </div>
+
+                <div class="col-md-4 text-center">
+                    <button class="btn btn-warning" id="MbtnAsignar_Manual" disabled="disabled">Asig. manual</button>
+                </div>
+
+                <div class="col-md-4 text-center">
+                    <a href="#" class="btnAceptado btn MbtnAtencion" id="MbtnAsignar_Automatica"></a>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!--Modal de advertencia de activación de estacion-->
+<div class="modal modal-open fade" id="Modal-AdvertenciaEstacion" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Mensaje de alerta</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h3><strong>No puede activar estación si no existen ticket pendientes.</strong></h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default pull-right" id="MbtnCerrar" data-dismiss="modal">Cerrar ventana</a>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>                          
+</div>
+
+
+

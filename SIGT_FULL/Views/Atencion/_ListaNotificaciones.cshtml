@@ -1,0 +1,42 @@
+﻿@model IEnumerable<CapaEntidad.Alertas>
+
+
+<!--Panel-->
+<div class="panel panel-danger" style="border-radius:0px">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <strong>Solicitudes de Estaciones </strong>
+        </h4>
+    </div>
+    <div id="ListaNotificaciones" class="panel-body" style="overflow-y: scroll; height:180px;">
+        @if(Model.Count() > 0){
+            foreach (var item in Model){
+                <div class="media itemNotificaciones">
+                    <div class="media-left">
+                        <a href="#">
+                            <img class="media-object" src="@Url.Content("~/Images/Icons/UserDown.png")" width="30" height="30" />
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h6 class="media-heading"><a href="#" class="fechaNotifica" style="font-weight:bold">@string.Format("{0:t}", item.Fecha)</a> <span class="usuarioNotifica" style="font-weight:bold">@item.EstacionTrabajo.Usuario.NombreCompleto</span> en el <span class="EstacionNotifica">@item.EstacionTrabajo.NombreEstacion</span> ha solicitado cierre de estación. </h6>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="media itemNotificaciones">
+                <div class="media-left">
+                    <a href="#">
+                        <img class="media-object" src="@Url.Content("~/Images/Icons/UserDown.png")" width="30" height="30" />
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h5 class="media-heading"><a>@DateTime.Now.ToString("hh:mm tt")</a> <span style="font-weight:bold">No existe solicitudes de estaciones actuales.</span> </h5>
+                </div>
+            </div>
+        }
+
+        
+    </div>
+</div>

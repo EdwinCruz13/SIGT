@@ -1,0 +1,1227 @@
+﻿@model CapaEntidad.EstacionTrabajo
+
+
+@{
+    ViewBag.Title = "ModuloAtencion";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+<!--Agregar la referencia del hubs, el buscara todos los hub existente usando AppStart de la aplicacion-->
+<script src="@Url.Content("~/signalr/hubs")"></script>
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagActual">Módulo de atención</li>
+        </ol>
+    </section>
+</div>
+
+
+<div class="row contentype">
+    <section class="col-md-12">
+        <div class="col-md-6">
+            <div class="col-md-2 visible-md visible-lg" style="margin-left:-20px; ">
+                <img src="@Url.Content("~/Images/Icons/chat.png")" width="80" height="80" />
+            </div>
+            <div class="col-md-10 text-left" style="margin-top:-10px">
+                <h3><strong>Atención al cliente</strong></h3>
+                <h4>Realice una llamada al cliente según el tipo de visita que realiza.</h4>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="col-md-6">
+            <div class="pull-right" style="margin-left: 10px; margin-top: -10px; background: rgba(230,230,230,0.2); padding: 5px 15px">
+                <h3 class="text-center"><strong>ACTIVAR ESTACIÓN</strong></h3>
+                <!--si no hay turnos asignados a la estacion-->
+                @if (Model.Turno.CodTicket == null || Model.Turno.CodTicket == "")
+                {
+                    <div class="text-center wrap">
+                        <label style="margin-left:5px">
+                            <input type="radio" name="Estado" id="Activar" class="EstadoEstacion" value="1">
+                            SI
+                        </label>
+                        <label style="margin-left:35px">
+                            <input type="radio" name="Estado" id="Desactivar" class="EstadoEstacion" value="0" checked="checked">
+                            NO
+                        </label>
+                    </div>
+                    
+                    
+                     <div>
+                        <h4 class="text-center" id="Estado" style="font-weight: bold; background: #985a5a; padding: 2px; color: #fff">ESTACIÓN INACTIVA</h4>
+                    </div>
+                    <div>
+                        <h4 class="text-center" id="UsuarioConectado" style="font-weight: bold; padding: 2px; color: #000">@Session["User"].ToString()</h4>
+                    </div> 
+
+                    
+                }
+                else{
+                    <div class="text-center wrap">
+                        <label style="margin-left:5px">
+                            <input type="radio" name="Estado" id="Activar" class="EstadoEstacion" value="1" checked="checked">
+                            SI
+                        </label>
+                        <label style="margin-left:35px">
+                            <input type="radio" name="Estado" id="Desactivar" class="EstadoEstacion" value="0">
+                            NO
+                        </label>
+                    </div>
+                    
+                    
+                     <div>
+                        <h4 class="text-center" id="Estado" style="font-weight: bold; background: #366019; padding: 2px; color: #fff">ESTACIÓN ACTIVA</h4>
+                    </div>
+                    <div>
+                        <h4 class="text-center" id="UsuarioConectado" style="font-weight: bold; padding: 2px; color: #000">@Session["User"].ToString()</h4>
+                    </div>
+                   
+                }
+
+
+
+                @*@if (Model.Estado != 0 || Model.Estado != -2){
+                    <div>
+                        <h4 class="text-center" id="Estado" style="font-weight: bold; background: #366019; padding: 2px; color: #fff">ESTACIÓN ACTIVA</h4>
+                    </div>
+                    <div>
+                        <h4 class="text-center" id="UsuarioConectado" style="font-weight: bold; padding: 2px; color: #000">----------</h4>
+                    </div>
+                }
+                else{
+                    <div>
+                        <h4 class="text-center" id="Estado" style="font-weight: bold; background: #985a5a; padding: 2px; color: #fff">ESTACIÓN INACTIVA</h4>
+                    </div>
+                    <div>
+                        <h4 class="text-center" id="UsuarioConectado" style="font-weight: bold; padding: 2px; color: #000">----------</h4>
+                    </div>
+                }*@
+            </div>
+
+           
+
+            
+
+        </div>
+        
+        
+        <div class="clearfix"></div>
+    </section>
+    <hr />
+    
+    <section class="col-md-12" style="margin-top:25px; border-top:solid 1px #a9a6a6">
+        <div class="col-md-2 visible-md visible-lg">
+            <div style="display: block; background: #FFC300; padding: 35px; border-radius: 2px; box-shadow: 0px 5px 1px 0px #3d3a3a">
+                <h4 class="text-center" style="margin-top:-15px"><strong>ESTACIÓN</strong></h4>   
+                <h5 id="NombreEstacion" class="text-center">@Model.NombreEstacion.Replace("Escritorio-", "")</h5>
+                <h5 id="NombreArea" class="text-center"><strong>@Model.Usuario.Area.Descripcion</strong></h5>
+            </div>
+        </div>
+        <div class="col-md-10" style="margin:0px; padding:0px">
+            <div class="col-md-12">
+                <section class="breadcrumb" style="border-radius: 2px; padding: 35px 10px; background: #eceff1; border: solid 1px #bdbdbd;">
+                    <table>
+                        @if (Model.Estado == 1 || Model.Estado == 2 || Model.Estado == 3 || Model.Estado == -1)
+                        {
+                            <tr>
+                                <td><span style="font-size: 18px; text-align: justify">TURNO</span></td>
+                                <td id="tdTurno"><span style="font-size:18px; margin-left:45px;"><strong>@Model.Ticket</strong></span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span style="font-size: 18px; text-align: justify">MOTIVO</span></td>
+                                <td id="tdMotivo"><span style="font-size:18px; margin-left:45px;"><strong>@Model.Turno.Motivo.Descripcion</strong></span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span style="font-size:18px; text-align:justify">PRIORIDAD</span></td>
+                                <td id="tdPrioridad"><span style="font-size:18px; margin-left:45px;"><strong>@Model.Turno.PrioridadDesc</strong></span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span style="font-size:18px; text-align:justify">CLIENTE</span></td>
+                                <td id="tdCliente"><span style="font-size:18px; margin-left:45px;"><strong>@Model.Turno.Cliente.NombreCompleto</strong></span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span style="font-size:18px; text-align:justify">INSTITUCIÓN</span></td>
+                                <td id="tdInstitucion"><span style="font-size:18px; margin-left:45px;"><strong>@Model.Institucion</strong></span></td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td><span style="font-size: 18px; text-align: justify">TURNO</span></td>
+                                <td id="tdTurno"><span style="font-size:18px; margin-left:45px;"><strong>----------------</strong></span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span style="font-size: 18px; text-align: justify">MOTIVO</span></td>
+                                <td id="tdMotivo"><span style="font-size:18px; margin-left:45px;"><strong>----------------</strong></span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span style="font-size:18px; text-align:justify">PRIORIDAD</span></td>
+                                <td id="tdPrioridad"><span style="font-size:18px; margin-left:45px;"><strong>----------------</strong></span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span style="font-size:18px; text-align:justify">CLIENTE</span></td>
+                                <td id="tdCliente"><span style="font-size:18px; margin-left:45px;"><strong>----------------</strong></span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span style="font-size:18px; text-align:justify">INSTITUCIÓN</span></td>
+                                <td id="tdInstitucion"><span style="font-size:18px; margin-left:45px;"><strong>----------------</strong></span></td>
+                            </tr>
+                        }
+
+                    </table>
+                </section>
+            </div>
+            <div class="col-md-12" style="margin:0px; padding:0px">
+                <section class="col-md-12" style="margin:0px; padding:0px">
+                    @if (Model.Estado != 0){
+                        <button id="btnLlamar" class="col-md-4 btnAccion btn" style="background:none; border:none">
+                            <div class="col-md-12" style="background: #eceff1; padding: 15px; border: solid 1px #bdbdbd; ">
+                                <div class="col-md-12">
+                                    <center><img src="@Url.Content("~/Images/Icons/Call.png")" width="45" height="45" /></center>
+                                </div>
+                                <div class="col-md-12">
+                                    <center><span class="text-center"><strong>Llamar Cliente</strong></span></center>
+                                </div>
+                            </div>
+                        </button>
+
+                        <button id="btnAtender" class="col-md-4 btnAccion btn" style="background:none; border:none">
+                            <div class="col-md-12" style="background: #eceff1; padding: 15px; border: solid 1px #bdbdbd; ">
+                                <div class="col-md-12">
+                                    <center><img src="@Url.Content("~/Images/Icons/Play.png")" width="45" height="45" /></center>
+                                </div>
+                                <div class="col-md-12">
+                                    <center><span class="text-center"><strong>Iniciar Atención</strong></span></center>
+                                </div>
+                            </div>
+                        </button>
+
+                        <button id="btnCancelar" class="col-md-4 btnAccion btn" style="background:none; border:none">
+                            <div class="col-md-12" style="background: #eceff1; padding: 15px; border: solid 1px #bdbdbd; ">
+                                <div class="col-md-12">
+                                    <center><img src="@Url.Content("~/Images/Icons/UserDown.png")" width="45" height="45" /></center>
+                                </div>
+                                <div class="col-md-12">
+                                    <center><span class="text-center"><strong>No se presentó</strong></span></center>
+                                </div>
+                            </div>
+                        </button>
+                        
+                    }
+                    else{
+                         <button id="btnLlamar" class="col-md-4 btnAccion" disabled="disabled" style="background:none; border:none">
+                            <div class="col-md-12" style="background: #eceff1; padding: 15px; border: solid 1px #bdbdbd; ">
+                                <div class="col-md-12">
+                                    <center><img src="@Url.Content("~/Images/Icons/Call.png")" width="45" height="45" /></center>
+                                </div>
+                                <div class="col-md-12">
+                                    <center><span class="text-center"><strong>Llamar Cliente</strong></span></center>
+                                </div>
+                            </div>
+                        </button>
+
+                        <button id="btnAtender" class="col-md-4 btnAccion" disabled="disabled" style="background:none; border:none">
+                            <div class="col-md-12" style="background: #eceff1; padding: 15px; border: solid 1px #bdbdbd; ">
+                                <div class="col-md-12">
+                                    <center><img src="@Url.Content("~/Images/Icons/Play.png")" width="45" height="45" /></center>
+                                </div>
+                                <div class="col-md-12">
+                                    <center><span class="text-center"><strong>Iniciar Atención</strong></span></center>
+                                </div>
+                            </div>
+                        </button>
+
+                        <button id="btnCancelar" class="col-md-4 btnAccion" disabled="disabled" style="background:none; border:none">
+                            <div class="col-md-12" style="background: #eceff1; padding: 15px; border: solid 1px #bdbdbd; ">
+                                <div class="col-md-12">
+                                    <center><img src="@Url.Content("~/Images/Icons/UserDown.png")" width="45" height="45" /></center>
+                                </div>
+                                <div class="col-md-12">
+                                    <center><span class="text-center"><strong>No se presentó</strong></span></center>
+                                </div>
+                            </div>
+                        </button>
+                        
+                    }
+
+                </section>
+
+                <!--contenedor temporal-->
+                @*<section id="ListaTemp" style="margin-top:80px">
+                    <div class="col-md-12">
+                        <h3 class="col-md-2">Usuario</h3>
+                        <h3 class="col-md-2">Ticket</h3>
+                        <h3 class="col-md-2">EstacionID</h3>
+                        <h3 class="col-md-2">Estacion</h3>
+                        <h3 class="col-md-2">Estado</h3>
+                    </div>
+                    <div class="col-md-12">
+                        <h4 class="usuario_temp col-md-3">xxxxx</h4>
+                        <h4 class="ticket_temp col-md-3">xxxxx</h4>
+                        <h4 class="estacionID_temp col-md-3">xxxxx</h4>
+                        <h4 class="estacionName_temp col-md-3">xxxxx</h4>
+                    </div>
+                </section>*@
+            </div>
+
+        </div>
+        
+    </section>
+</div>
+
+<!--Modal de advertencia de activación de estacion-->
+<div class="modal modal-open fade" id="Modal-ActivarEstacion" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Atención al cliente</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h4 class="text-justify"><strong>Esta a punto de <span id="txt-Activacion"></span> la estación de trabajo. ¿Desea continuar?</strong></h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <h4 id="MessageError_Validate" style="color:#a84646" class="pull-left"></h4>
+                <a href="#" class="btn btn-default pull-left" id="MbtnCerrar">Cerrar</a>
+                <a href="#" class="btnAceptado btn btn-danger pull-right" id="MbtnAtencion"></a>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal para la atención de clientes, mostrar las opciones principales-->
+<div class="modal modal-open fade" id="Modal-Atencion" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Atención al cliente</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <!--datos del turno-->
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="email">ID</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="id_inp" name="cliente_inp" readonly="readonly" style="max-width:100%" >
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="email">CLIENTE</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="cliente_inp" name="cliente_inp" readonly="readonly" style="max-width: 100%; background: #fff">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="email">TURNO</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="turno_inp" name="cliente_inp" readonly="readonly" style="max-width: 100%; background: #fff">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="email">MOTIVO</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="motivo_inp" name="cliente_inp" readonly="readonly" style="max-width:100%; background:#fff"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="container" style="max-width:100%; border:solid 1px #a9a6a6; padding:5px 20px; box-shadow: 0px 0px 2px 1px rgba(230,230,230,0.2)">
+                                        <h2 class="col-md-2 col-sm-offset-1 text-center"><span id="hour">00</span><small>hh</small></h2> 
+                                        <h2 class="col-md-2 text-center">:</h2> 
+                                        <h2 class="col-md-2 text-center"><span id="minute">00</span><small>mm</small></h2> 
+                                        <h2 class="col-md-2 text-center">:</h2> 
+                                        <h2 class="col-md-2 text-center"><span id="second">00</span><small>ss</small></h2>
+                                    </div>
+                                </div> 
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="col-md-4 text-center">
+                    <a href="#" class="btn btn-default pull-left" id="btnCerrar_Atencion" data-dismiss="modal"><span class="glyphicon glyphicon-warning-sign"></span> Cerrar ventana</a>
+                </div>
+                <div class="col-md-4 text-center">
+                    <a href="#" class="btn btn-info" id="btnIniciar_Atencion"><span class="glyphicon glyphicon-play"></span> Iniciar atención</a>
+                </div>
+                <div class="col-md-4 text-center">
+                    <a href="#" class="btn btn-danger pull-right disabled" id="btnFinalizar_Atencion"><span class="glyphicon glyphicon-stop"></span> Finalizar atención</a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal para confirmar la atencion finalizada-->
+<div class="modal modal-open fade" id="Modal-FinalizarAtencion" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title" style="color: #000"><strong>Atención al cliente</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <!--datos del turno-->
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    La atención al cliente <span id="cliente_c">xxx</span> con la ticket <span id="ticket_c">xxx</span> se ha completado.
+                                    Para continuar con el proceso, ingrese las observaciones del trámite realizado, posterior, seleccione la opción adecuada.
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-12">Tiempo utilizado</label>
+                                <div class="col-sm-12">
+                                    <div id="tiempoEjecutado" class="container" style="max-width:100%; border:solid 1px #a9a6a6; padding:5px 20px; box-shadow: 0px 0px 2px 1px rgba(230,230,230,0.2)">
+                                        <h2 class="col-md-2 col-sm-offset-1 text-center"><span id="hour_c">00</span><small>hh</small></h2>
+                                        <h2 class="col-md-2 text-center">:</h2>
+                                        <h2 class="col-md-2 text-center"><span id="minute_c">00</span><small>mm</small></h2>
+                                        <h2 class="col-md-2 text-center">:</h2>
+                                        <h2 class="col-md-2 text-center"><span id="second_c">00</span><small>ss</small></h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group"> 
+                                <label class="col-sm-12" for="email">Observaciones</label>
+                                <div class="col-sm-12">
+                                    <textarea class="form-control" id="observaciones_c" style="max-width: 100%; resize: none" rows="4"></textarea>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="col-md-12">
+                    <div class="col-md-6 text-center">
+                        <a href="#" class="btn btn-danger" id="btnGuardar_Cerrar" data-dismiss="modal"><span class="glyphicon glyphicon-stop"></span> Guardar y cerrar estación</a>
+
+
+                        @*<a href="#" class="btn btn-danger" id="btnGuardar_Cerrar" data-dismiss="modal"><span class="glyphicon glyphicon-stop"></span> Guardar y notificar cierre</a>*@
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <a href="#" class="btn btn-success" id="btnGuardar_Continuar"><span class="glyphicon glyphicon-play"></span> Guardar y continuar atendiendo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal de advertencia de cancelar citas-->
+<div class="modal modal-open fade" id="Modal-CancelarCliente" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Atención al cliente</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h4 class="text-justify"><strong>La visita esta apunto de ser cancelada, ¿Usted está seguro que desea continuar?</strong></h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default pull-left" data-dismiss="modal" id="btnCerrar">Cerrar</a>
+                <a href="#" class="btn btn-danger pull-right" id="MbtnConfirmar_Cancelar">Cancelar Cita</a>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal de advertencia de cancelar citas-->
+<div class="modal modal-open fade" id="Modal-AsignarNuevo_Ticket" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Atención al cliente</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h4 class="text-justify"><strong>Asignando nuevo ticket a la estación...</strong></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal para cuenta regresivas-->
+<div class="modal modal-open fade" id="Modal-CuentaRegresiva" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Atención al cliente</strong></h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <!--datos del turno-->
+                        <form class="form-horizontal">
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <h4 class="text-justify"><strong>Se ha enviando una notificación al responsable de área, para la aprobación de la solicitud.</strong></h4>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <div class="container" style="max-width:100%; border:solid 1px #a9a6a6; padding:5px 20px; box-shadow: 0px 0px 2px 1px rgba(230,230,230,0.2)">
+                                        <h2 class="col-md-2 col-sm-offset-1 text-center"><span id="CuentaRegresiva_hour">00</span><small>hh</small></h2>
+                                        <h2 class="col-md-2 text-center">:</h2>
+                                        <h2 class="col-md-2 text-center"><span id="CuentaRegresiva_minute">02</span><small>mm</small></h2>
+                                        <h2 class="col-md-2 text-center">:</h2>
+                                        <h2 class="col-md-2 text-center"><span id="CuentaRegresiva_second">00</span><small>ss</small></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal de advertencia de activación de estacion-->
+<div class="modal modal-open fade" id="Modal-AdvertenciaEstacion" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Estado de la estación de trabajo</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h3>Actualmente no hay ticket que atender!, se cerrará automáticamente la estación de trabajo.</h3>
+                        <h4>En el caso que haya clientes, favor de activarse manualmente.</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a href="@Url.Action("ModuloAtencion", "Atencion", new { usuario = Session["User"].ToString() })" class="btn btn-default pull-right" id="MbtnCerrar">Cerrar</a>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal de advertencia de cierre de estación-->
+<div class="modal modal-open fade" id="Modal-CierreEstacion" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Estado de la estación de trabajo</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h3>Cerrando la estación de trabajo.</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<script>
+    //variables globales
+    var objEstacion, estado, ticket, codticket, motivo, prioridad, nombre_estacion, ip_estacion, area, institucion;
+    var cliente, idcliente, cedula_cliente;
+
+
+    //Crear la referencia al hub (usar camel-case de la clase)
+    var EstacionHub = $.connection.estacionHub;
+    var MonitorHub = $.connection.monitorHub;
+    var AlertasHub = $.connection.alertasHub;
+
+
+    //var SesionUsuario_HUB = $.connection.usuarioHub;
+
+    //Al cargar la pagina asignar los datos a las variables
+    codticket = '@Model.CodTicket'; ticket = '@Model.Ticket';
+    motivo = '@Model.Turno.Motivo.Descripcion';
+    cliente = '@Model.Turno.Cliente.NombreCompleto'; idcliente = '@Model.Turno.Cliente.IdCliente'
+    //obj
+    Zona = { IdZona: '@Model.Turno.Motivo.Zona.IdZona' };
+    Motivo = { Descripcion: '@Model.Turno.Motivo.Descripcion', Zona: Zona };
+    Turno = { Motivo: Motivo };
+    objEstacion = {
+        Ticket: '@Model.Ticket',
+        CodTicket: '@Model.CodTicket',
+        NombreEstacion: '@Model.NombreEstacion',
+        Institucion: '@Model.Institucion',
+        IpEstacion: '@Model.IpEstacion',
+        CodEstacion: '@Model.CodEstacion',
+        Turno: Turno
+    };
+
+    //obtener el valor del radiobutton
+    var valorRadioButton = 0; //1 estaciones activas o 0 estaciones inactivas
+    var radioButton;
+
+    //objeto tiempo
+    var tiempo = { hora: 0, minuto: 0, segundo: 0 };
+    var tiempo2 = { hora: 0, minuto: 0, segundo: 0 };
+    var t = 0;
+
+    var tiempo_corriendo = null;
+    var tiempo_regresivo = null;
+
+
+    //iniciarlizar signarlR con la respuesta del hub
+    RespuestaActivacion();
+
+
+    //inicializar el signalR
+    function RespuestaActivacion() {
+        //inicialistar el hub
+        $.connection.hub.start().done(function () {
+            //añadir comportamiento con eventos jquery
+            EstacionHub.server.conectar('@Session["User"].ToString()', '@Session["IP"].ToString()', true);
+
+            //Obtener el evento change del radiobutton
+            //este evento hará que active y desactive la
+            //estacion de trabajo
+            $(".EstadoEstacion").change(function () {
+                radioButton = $(this);
+                valorRadioButton = $(this).val();
+
+                //activar estación
+                if (valorRadioButton == 1) {
+                    ActivarEstacion('@Session["User"].ToString()', '@Session["IP"].ToString()');
+                }
+
+                //desactivar estación
+                if (valorRadioButton == 0) {
+                    DesactivarEstacion('@Session["User"].ToString()', '@Session["IP"].ToString()');
+
+                }
+
+            });
+
+        });
+
+        //informacion de la estaciones activas
+        EstacionHub.client.conectadosEstacion = function (EstacionesActivas) {
+            //TEST
+            //imprimir
+            console.log(EstacionesActivas);
+
+            //recorrer todos los elementos de la lista enviada desde hub y comparar con la sesion actual
+            $.each(EstacionesActivas, function (index, estacion) {
+                if (estacion.Cuenta == '@Session["User"].ToString()') {
+                    //activar botones
+                    PrepararEncenderEstacion();
+
+                    //crear el objeto que servira llamar al turno por el televisor
+                    objEstacion = estacion;
+                    //informacion del ticket
+                    estado = (estacion.Estado != 0) ? "ESTACIÓN ACTIVA" : "ESTACIÓN INACTIVA";
+                    ticket = estacion.Ticket;
+                    codticket = estacion.CodTicket;
+                    institucion = estacion.Institucion;
+                    //informacion del cliente y la visita
+                    motivo = estacion.Turno.Motivo.Descripcion;
+                    cliente = estacion.Turno.Cliente.NombreCompleto;
+                    idcliente = estacion.Turno.Cliente.IdCliente;
+                    //informacion de la estacion
+                    prioridad = estacion.Turno.PrioridadDesc;
+                    nombre_estacion = estacion.NombreEstacion;
+                    ip_estacion = estacion.IpEstacion;
+                    area = estacion.Turno.Motivo.Zona.Descripcion;
+
+                    //Agregar la informacion obtenida los componente correspondientes
+                    $("#Estado").html("<strong>" + estado + "</strong>");
+                    if (estacion.Estado != 0)
+                        $("#Estado").css("background", "#366019");
+                    else
+                        $("#Estado").css("background", "#985a5a");
+
+
+                    $("#tdTurno span").html("<strong>" + ticket + "</strong>");
+                    $("#tdMotivo span").html("<strong>" + motivo + "</strong>");
+                    $("#tdCliente span").html("<strong>" + cliente + "</strong>");
+                    $("#tdInstitucion span").html("<strong>" + institucion + "</strong>");
+                    $("#tdPrioridad span").html("<strong>" + prioridad + "</strong>");
+                    $("#NombreEstacion").html("<strong>" + estacion.NombreEstacion.replace("Escritorio-", "") + "</strong>");
+                    $("#NombreArea").html("<strong>" + estacion.Turno.Motivo.Zona.Descripcion + "</strong>");
+
+
+
+                    
+
+                }
+
+            });
+        };
+
+
+        //informacion de la estaciones inactivas
+        @*EstacionHub.client.desconectadosEstacion = function (EstacionesInactivas) {
+            //recorrer todos los elementos de la lista enviada desde hub y comparar con la sesion actual
+            $.each(EstacionesInactivas, function (index, estacion) {
+                if (estacion.Cuenta == '@Session["User"].ToString()') {
+                    //desactivar botones
+                    PrepararApagarEstacion();
+
+                    if (estacion.Estado == 0)
+                        DetenerCuentaRegresiva();
+
+                    //resetear los elementos del dom
+                    $("#Estado").html("<strong>ESTACIÓN INACTIVA</strong>");
+                    $("#Estado").css("background", "#985a5a");
+
+                    $("#tdTurno span").html("<strong>----------------</strong>");
+                    $("#tdMotivo span").html("<strong>----------------</strong>");
+                    $("#tdCliente span").html("<strong>----------------</strong>");
+                    $("#tdPrioridad span").html("<strong>----------------</strong>");
+                }
+            });
+        };*@
+    }
+
+
+
+    //evento para llamar al cliente, se presentará al televisor
+    //el ticket que se esta llamando
+    $("#btnLlamar").click(function () {
+        LlamarTurno();
+
+        //desactivar temporalmente el boton por 7s
+        $("#btnLlamar").prop("disabled", true);
+        if (t == 0) {
+            var TiempoBotton = setInterval(function () {
+                t++;
+                if (t > 7) {
+                    t = 0;
+                    $("#btnLlamar").prop("disabled", false);
+                }
+            }, 1000);
+        }
+
+    });
+
+    //evento que cancela la atencion
+    //a un turno, reasignara el ticket
+    //abrirar el modal para confirmar la cancelacion
+    $("#btnCancelar").click(function () {
+        //activar modal para confirmar la accion
+        $("#Modal-CancelarCliente").modal({
+            show: "true",
+            backdrop: 'static',
+            keyboard: false
+        });
+    });
+    //cancelacion de ticket una vez confirmada la accion
+    $("#MbtnConfirmar_Cancelar").click(function () {
+        //cerrar modal
+        $('#Modal-CancelarCliente').modal('hide');
+
+        //actualizar el estado del ticket a 0
+        CancelarTurno();
+        //reasignar turnos
+        ReasignarTurno();
+    });
+
+
+    //inicializa el cronometro para ejecutar el tiempo
+    //abriendo una ventana emergente donde muestra la informacion del cliente y tickets
+    $("#btnAtender").click(function () {
+        PrepararCronometro();
+        //agregar la información del turno actual al formulario para iniciar la atencion
+        $("#id_inp").val(idcliente);
+        $("#cliente_inp").val(cliente);
+        $("#turno_inp").val(ticket);
+        $("#motivo_inp").val(motivo);
+        $("#observaciones_c").val('');
+
+        //abrir modal
+        $("#Modal-Atencion").modal({
+            show: "true",
+            backdrop: 'static',
+            keyboard: false
+        });
+
+        //iniciar automaticamente el evento click para el boton #btnIniciar_Atencion
+        $("#btnIniciar_Atencion").click();
+
+
+    });
+    //iniciar cronometro y la atencion
+    $("#btnIniciar_Atencion").click(function () {
+        //iniciar cronometro
+        IniciarCronometro();
+
+        //inicia la atencion
+        IniciarAtencion();
+
+    });
+
+    //detener cronometro
+    $("#btnFinalizar_Atencion").click(function () {
+        DetenerCronometro();
+
+        //esconder el modal con la informacion del cronómetro
+        $('#Modal-Atencion').modal('hide');
+
+
+        //asignar los campos al formulario de finalizacion de atencion
+        $("#hour_c").html($("#hour").html()); //hora
+        $("#minute_c").html($("#minute").html()); //minuto
+        $("#second_c").html($("#second").html()); //segundos
+        $("#cliente_c").html("<strong>" + cliente + "</strong>"); //cliente
+        $("#ticket_c").html("<strong>" + ticket + "</strong>"); //ticket
+
+        //terminar la cita, comunicarse con el hub
+        FinalizarAtencion();
+
+        //abrir el modal para confirmar la transaccion
+        //abrir modal
+        $("#Modal-FinalizarAtencion").modal({
+            show: "true",
+            backdrop: 'static',
+            keyboard: false
+        });
+
+    });
+
+
+    //Opciones para finalizar la atención al cliente
+    //funcion para guardar y continuar atendiendo
+    $("#btnGuardar_Continuar").click(function () {
+        //tiempoEjecutado, , btnGuardar_Continuar
+        //capturar valores
+        tiempoEjecutado = $("#tiempoEjecutado").text().replace(/([\ \t]+(?=[\ \t])|^\s+|\s+$)/g, '').split("\n").join("");
+        observaciones_c = $("#observaciones_c").val();
+
+        //actualizar el turnos agregando las observaciones, comunicarse con el hub
+        ActualizarObservaciones(tiempoEjecutado, observaciones_c);
+
+
+        //cerar modal padre para Reasignar otro ticket
+        $('#Modal-FinalizarAtencion').modal('hide');
+
+        //reasignar ticket
+        ReasignarTurno();
+
+
+    });
+
+
+
+    //funcion para guardar y cerrar estación
+    $("#btnGuardar_Cerrar").click(function () {
+        //tiempoEjecutado,
+        //capturar valores
+        tiempoEjecutado = $("#tiempoEjecutado").text().replace(/([\ \t]+(?=[\ \t])|^\s+|\s+$)/g, '').split("\n").join("");
+        observaciones_c = $("#observaciones_c").val();
+        //actualizar el turnos agregando las observaciones, comunicarse con el hub
+        ActualizarObservaciones(tiempoEjecutado, observaciones_c);
+        //cerrar modal padre para Reasignar otro ticket
+        $('#Modal-FinalizarAtencion').modal('hide');
+
+
+        //cierrer de estacion
+        setTimeout(function () {
+            //abrir modal para advertir al usuario que se cerrará la estacion
+            $("#Modal-CierreEstacion").modal({
+                show: "true",
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            //cerrar estación por medio del hub
+            EstacionHub.server.desactivar('@Session["User"].ToString()', '@Session["IP"].ToString()');
+
+
+            //cerrar modal despues de 2s
+            setTimeout(function () {
+                //eliminar los cheked
+                $("#Activar").prop("checked", false);
+
+                //agregar cheked
+                $("#Desactivar").prop("checked", true);
+                valorRadioButton = 0;
+                $('#Modal-CierreEstacion').modal('hide');
+            }, 2000);
+
+
+            //Modificado
+            PrepararApagarEstacion();
+            //resetear los elementos del dom
+            $("#Estado").html("<strong>ESTACIÓN INACTIVA</strong>");
+            $("#Estado").css("background", "#985a5a");
+
+            $("#tdTurno span").html("<strong>----------------</strong>");
+            $("#tdMotivo span").html("<strong>----------------</strong>");
+            $("#tdCliente span").html("<strong>----------------</strong>");
+            $("#tdInstitucion span").html("<strong>----------------</strong>");
+            $("#tdPrioridad span").html("<strong>----------------</strong>");
+
+
+        }, 800);
+
+
+    });
+
+
+    //conectarse al hub, funcion conectar estacion y asignar automaticamente los tickets
+    //el resultado se visualizará en la pantalla de las
+    //estaciones
+    function ActivarEstacion(usuario, ip) {
+        //Validar si existe tickets
+        EstacionHub.server.validarActivacion(usuario, ip).done(function (Message) {
+
+           //si hay tickets, activar la estación de trabajo
+            if (Message == true) {
+                //abrir el modal para la asignacion del ticket
+                $("#Modal-AsignarNuevo_Ticket").modal({
+                    show: "true",
+                    backdrop: 'static',
+                    keyboard: false
+                });
+
+                //ejecutar la accion para reasignar turnos
+                setTimeout(function () {
+                    //cerrar modal
+                    $('#Modal-AsignarNuevo_Ticket').modal('hide');
+                    ///////comunicarse al hub1 para activar la estacion////
+                    EstacionHub.server.activar(usuario, ip);
+                }, 3500);
+            }
+
+            //si no hay tickets
+            if (Message == false) {
+                ///////comunicarse al hub1 para desactivar la estacion////
+                EstacionHub.server.desactivar(usuario, ip);
+
+                //abrir el modal para el cierre de la estación
+                $("#Modal-AdvertenciaEstacion").modal({
+                    show: "true",
+                    backdrop: 'static',
+                    keyboard: false
+                });
+
+                //ejecutar para cerrar modal y cerrar la estacion
+                setTimeout(function () {
+                    //eliminar los cheked
+                    $("#Activar").prop("checked", false);
+
+                    //agregar cheked
+                    $("#Desactivar").prop("checked", true);
+                    valorRadioButton = 0;
+                    $('#Modal-AdvertenciaEstacion').modal('hide');
+
+
+                    //recarga la misma pagina
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                }, 4000);
+
+            }
+
+
+        });
+
+    }
+
+    //funcion que permite llamar al turno seleccionado
+    //presentando la informacion al televisor
+    //se conectará al hub Monitor
+    function LlamarTurno() {
+        MonitorHub.server.llamar(objEstacion);
+    }
+
+    //funciones que permite controlar la atencion al
+    //cliente, actualizara los estados de la estacion y ticket
+    //Iniciar atencion (3)
+    function IniciarAtencion() {
+        EstacionHub.server.atencion('@Session["User"].ToString()', '@Session["IP"].ToString()', 3, '', '');
+    }
+    //finalizar atencion(4)
+    function FinalizarAtencion() {
+        EstacionHub.server.atencion('@Session["User"].ToString()', '@Session["IP"].ToString()', 4, '', '');
+    }
+
+    //finalizar atencion(-1)
+    function ActualizarObservaciones(tiempoEjecutado, observaciones_c) {
+        EstacionHub.server.atencion('@Session["User"].ToString()', '@Session["IP"].ToString()', -1, tiempoEjecutado, observaciones_c);
+    }
+
+    //funcion que permite reasignar el turno
+    //detectará si la estacion esta activa
+    //enviará los datos al hub's (usuario, ip, valor)
+    function ReasignarTurno() {
+        //reasignar ticket
+        //verificar si existe turnos
+        //validar si existe turno, ir al metodo ValidarActivacion en el hub EstacionHub
+        EstacionHub.server.validarActivacion('@Session["User"].ToString()', '@Session["IP"].ToString()').done(function (Message) {
+            if (Message == true) {
+                //abrir el modal para la asignacion del ticket
+                $("#Modal-AsignarNuevo_Ticket").modal({
+                    show: "true",
+                    backdrop: 'static',
+                    keyboard: false
+                });
+
+                //ejecutar la accion para reasignar turnos
+                setTimeout(function () {
+                    //cerrar modal
+                    $('#Modal-AsignarNuevo_Ticket').modal('hide');
+                    ///////comunicarse al hub1////
+                    EstacionHub.server.reasignar('@Session["User"].ToString()', '@Session["IP"].ToString()');
+                }, 1500);
+            }
+
+            //si no hay tickets, desactivar la estación
+             //si no hay tickets
+            if (Message == false) {
+
+                EstacionHub.server.desactivar('@Session["User"].ToString()', '@Session["IP"].ToString()');
+               //abrir el modal para el cierre de la estación
+               $("#Modal-AdvertenciaEstacion").modal({
+                   show: "true",
+                   backdrop: 'static',
+                   keyboard: false
+               });
+
+               //ejecutar para cerrar modal y cerrar la estacion
+               setTimeout(function () {
+                   //eliminar los cheked
+                   $("#Activar").prop("checked", false);
+
+                   //agregar cheked
+                   $("#Desactivar").prop("checked", true);
+                   valorRadioButton = 0;
+                   $('#Modal-AdvertenciaEstacion').modal('hide');
+
+
+                   //recarga la misma pagina
+                   setTimeout(function () {
+                       location.reload();
+                   }, 1000);
+               }, 4000);
+
+           }
+
+        });
+
+    }
+
+    //Cancelar turno
+    function CancelarTurno() {
+        EstacionHub.server.cancelar(codticket.replace("-", ""), ticket.replace("-", ""), '@Session["User"].ToString()', '@Session["IP"].ToString()');
+    }
+
+
+    function AlertaCierre() {
+        //enviar la informacion al hub AlertasHub
+        AlertasHub.server.notificar(objEstacion);
+    }
+
+    //conectarse al hub, funcion desconectar estacion
+    //el resultado se visualizará en la pantalla de las
+    //estaciones
+    function DesactivarEstacion(usuario, ip) {
+        //EstacionHub.server.finTrabajo(usuario, ip);
+        EstacionHub.server.desactivar(usuario, ip);
+
+        //abrir modal para advertir al usuario que se cerrará la estacion
+        $("#Modal-CierreEstacion").modal({
+            show: "true",
+            backdrop: 'static',
+            keyboard: false
+        });
+
+        setTimeout(function () {
+            //eliminar los cheked
+            $("#Activar").prop("checked", false);
+
+            //agregar cheked
+            $("#Desactivar").prop("checked", true);
+            valorRadioButton = 0;
+            $('#Modal-CierreEstacion').modal('hide');
+        }, 4000);
+
+
+
+        //Modificado!!!!!
+        PrepararApagarEstacion();
+        //resetear los elementos del dom
+        $("#Estado").html("<strong>ESTACIÓN INACTIVA</strong>");
+        $("#Estado").css("background", "#985a5a");
+
+        $("#tdTurno span").html("<strong>----------------</strong>");
+        $("#tdMotivo span").html("<strong>----------------</strong>");
+        $("#tdCliente span").html("<strong>----------------</strong>");
+        $("#tdPrioridad span").html("<strong>----------------</strong>");
+
+
+    }
+
+
+
+
+    //funcion que permite preparar los botones
+    //activara los botones necesario y asignará los ticket a las estacion
+    function PrepararEncenderEstacion() {
+        //remover los atributos disabled a los botones
+        $(".btnAccion").prop("disabled", false);
+    }
+
+    //funcion que permite preparar los botones
+    //desactivara los botones y detendra la asignacion de ticket
+    function PrepararApagarEstacion() {
+        //agregar los atributos disabled a los botones
+        $(".btnAccion").prop("disabled", true);
+    }
+
+
+    //preparar cronometro
+    function PrepararCronometro() {
+        //controlar el tiempo por evento de boton //habilitar el boton de "Finalizar atención"
+        $("#btnFinalizar_Atencion").addClass('disabled'); //quitar la clase disabled
+        $("#btnCerrar_Atencion").removeClass('disabled');    //agregar la clase disabled
+        $("#btnIniciar_Atencion").removeClass('disabled');  //agregar la clase disabled
+
+        $("#hour").html("00");
+        $("#minute").html("00");
+        $("#second").html("00");
+    }
+
+    //inicializar el cronometro
+    function IniciarCronometro() {
+        tiempo = { hora: 0, minuto: 0, segundo: 0 };
+        //controlar el tiempo por evento de boton //habilitar el boton de "Finalizar atención"
+        $("#btnFinalizar_Atencion").removeClass('disabled'); //quitar la clase disabled
+        $("#btnCerrar_Atencion").addClass('disabled');      //agregar la clase disabled
+        $("#btnIniciar_Atencion").addClass('disabled');     //agregar la clase disabled
+
+        //tiempo
+        clearInterval(tiempo_corriendo);
+        tiempo_corriendo = setInterval(function () {
+            // Segundos
+            tiempo.segundo++;
+            if (tiempo.segundo >= 60) {
+                tiempo.segundo = 0;
+                tiempo.minuto++;
+            }
+
+            // Minutos
+            if (tiempo.minuto >= 60) {
+                tiempo.minuto = 0;
+                tiempo.hora++;
+            }
+
+            //asignar tiempo a los div
+            $("#hour").text(tiempo.hora < 10 ? '0' + tiempo.hora : tiempo.hora);
+            $("#minute").text(tiempo.minuto < 10 ? '0' + tiempo.minuto : tiempo.minuto);
+            $("#second").text(tiempo.segundo < 10 ? '0' + tiempo.segundo : tiempo.segundo);
+
+        }, 900);
+    }
+
+    //detener cronometro
+    function DetenerCronometro() {
+        //detener el tiempo
+        clearInterval(tiempo_corriendo);
+    }
+
+
+    //cuenta regresiva
+    function IniciarCuentaRegresiva() {
+        tiempo2 = { hora: 0, minuto: 2, segundo: 00 };
+
+        //tiempo
+        clearInterval(tiempo_regresivo);
+        tiempo_regresivo = setInterval(function () {
+            // Segundos
+            tiempo2.segundo--;
+            if (tiempo2.segundo < 0) {
+                tiempo2.segundo = 59;
+                tiempo2.minuto--;
+            }
+
+            // Minutos
+            if (tiempo2.minuto < 0) {
+                tiempo2.minuto = 0;
+                tiempo2.segundo = 0;
+                tiempo2.hora = "-01";
+
+                //to-do mejorar esta parte
+                //cerrar cuenta regresiva y asignar ticket
+                if (tiempo2.hora == "-01") {
+                    DetenerCuentaRegresiva();
+                    ReasignarTurno();
+                }
+            }
+
+            //asignar tiempo a los div
+            $("#CuentaRegresiva_hour").text((tiempo2.hora < 10 && tiempo2.hora >= 0) ? '0' + tiempo2.hora : tiempo2.hora);
+            $("#CuentaRegresiva_minute").text(tiempo2.minuto < 10 ? '0' + tiempo2.minuto : tiempo2.minuto);
+            $("#CuentaRegresiva_second").text(tiempo2.segundo < 10 ? '0' + tiempo2.segundo : tiempo2.segundo);
+        }, 1000);
+    }
+
+
+    function DetenerCuentaRegresiva() {
+        //detener cuenta regresiva
+        clearInterval(tiempo_regresivo);
+
+        //cerar modal cuenta regresiva
+        $('#Modal-CuentaRegresiva').modal('hide');
+    }
+
+
+
+
+
+
+
+
+</script>
+

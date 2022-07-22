@@ -1,0 +1,89 @@
+﻿<script>
+    //script que permite crear el diagram de ticket totales vs atendidos
+    //usará ajax para comunicarse con el controlador Usuario y devolver la lista de tickets
+    //guardar en contadores el monto total de ticket y los ticket atendidos
+    $(document).ready(function () {
+        _TotalTicket_Atendido();
+        function _TotalTicket_Atendido() {
+            //usar las siguientes ecuaciones para determinar
+            //los valores a utilizar en las graficas (validar si existe cocientes 0)
+            VAtendidos = ('@ViewBag.TicketDia' == 0) ? 0 : ('@ViewBag.Atendidos' / '@ViewBag.TicketDia') * 100;
+            VEspera = ('@ViewBag.TicketDia' == 0) ? 0 : ('@ViewBag.Espera' / '@ViewBag.TicketDia') * 100;
+            VAnulados = ('@ViewBag.TicketDia' == 0) ? 0 : (('@ViewBag.Anulado' / '@ViewBag.TicketDia') * 100);
+            VAtendiendose = ('@ViewBag.TicketDia' == 0) ? 0 : (('@ViewBag.Atendiendose' / '@ViewBag.TicketDia') * 100);
+
+            //dibujar el diagrama circular en el div container
+            Highcharts.chart('container', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    backgroundColor: 'rgba(255, 255, 255, 0.0)',
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Total de tickets atendidos'
+                },
+                subtitle: {
+                    align: 'center',
+                    text: 'Total de tickets del día = ' + '@ViewBag.TicketDia' + "<br> Atendidos = " + '@ViewBag.Atendidos' + " | Anulados = " + '@ViewBag.Anulado' + " | Pendientes = " + '@ViewBag.Espera' + "<br>En Atención = " + '@ViewBag.Atendiendose',
+                    style: {
+                        fontSize: '11px'
+                    }
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                credits: {
+                    enabled: false
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        size: "70%",
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                            },
+                            connectorColor: 'silver'
+                        },
+                        showInLegend: true
+                    }
+                },
+                //colors: ['#1b5e20', '#01579b', '#b71c1c'],
+                series: [{
+                    name: 'Reporte 2',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'Atendidos',
+                        y: VAtendidos,
+                        sliced: true,
+                        selected: true
+
+                    }, {
+                        name: 'Anulados',
+                        y: VAnulados
+                    },{
+                        name: 'En espera',
+                        y: VEspera
+                    }, {
+                        name: 'En Atención',
+                        y: VAtendiendose
+                    }]
+                }]
+            });
+
+        };
+
+        jQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) { // on tab selection event
+            jQuery("#container").each(function () {
+                var chart = jQuery(this).highcharts(); // target the chart itself
+                chart.reflow() // reflow that chart
+            });
+        });
+    });
+</script>
+<div id="container" style="z-index:-10"></div>

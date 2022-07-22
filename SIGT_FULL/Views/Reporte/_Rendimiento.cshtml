@@ -1,0 +1,96 @@
+﻿<h4>
+    <small class="pull-left" style="color:#9e9e9e"><i class="glyphicon glyphicon-file"></i> <b>Rendimiento adquirido</b></small>
+    <small class="pull-right" style="color:#9e9e9e"><i class="glyphicon glyphicon-signal"></i></small>
+    <span class="clearfix"></span>
+</h4>
+
+<hr />
+
+
+<div class="outer" style="height:400px">
+    <div id="@ViewBag.IdDiv" class="Report"></div>
+</div>
+
+@*<div class="col-md-12" style="margin-top:1rem">
+
+
+
+        <div class="col-md-5" style="margin-top:5rem">
+            <div class="col-md-12" style="padding:0">
+
+                <div class="col-md-12" style="padding:0; color:#555252 ;">
+                    <span class="badge badge-circle badge-primary col-md-6" style="background:#0d47a1"></span>
+                    <h6 class="col-md-6" style="margin-top:-0.9rem; margin-left:20px; padding:0; width:100%">Rendimiento - @string.Format("{0:n}", ViewBag.Rendimiento)%</h6>
+                </div>
+
+                <div class="col-md-12" style="padding:0; color:#555252 ;">
+                    <span class="badge badge-circle badge-primary pull-left" style="background:#1565c0"></span>
+                    <h6 class="pull-left" style="margin-top:-0.9rem; margin-left:20px; padding:0; width:100%">Total de tickets - @ViewBag.Tickets <small>tickets</small></h6>
+                </div>
+
+                <div class="col-md-12" style="padding:0; color:#555252 ;">
+                    <span class="badge badge-circle badge-primary col-md-6" style="background:#1976d2; padding:0"></span>
+                    <h6 class="col-md-6" style="margin-top:-0.9rem; margin-left:20px; padding:0; width:100%">Mejor día - @ViewBag.MejorDia</h6>
+                </div>
+
+                <div class="col-md-12" style="padding:0; color:#555252 ;">
+                    <span class="badge badge-circle badge-primary pull-left" style="background:#1e88e5"></span>
+                    <h6 class="pull-left" style="margin-top:-0.9rem; margin-left:20px; padding:0; width:100%">Mejor resultado - @string.Format("{0:n}", ViewBag.MejorRendimiento)%</h6>
+                </div>
+            </div>
+
+        </div>
+    </div>*@
+
+
+
+<script>
+    $(document).ready(function () {
+        var HighchartsGauge;
+        Gauge();
+
+        $("#username").html("@ViewBag.User");
+        $("#TotalWork").html("@string.Format("{0:n}", ViewBag.TotalWork).Replace(".00", "")" + " Horas");
+        $("#TotalRequired").html("@string.Format("{0:n}", ViewBag.TimeRequired).Replace(".00", "")" + " Horas");
+
+        $("#TotalTicket").html("@ViewBag.Tickets" + " Tickets");
+        $("#ObtainedPerformance").html("@string.Format("{0:n}", ViewBag.Performance).Replace(".00", "")" + " %");
+        
+        //crear gráfica
+        function Gauge() {
+            //declarar un arreglo y declara objeto
+            var Series = [];
+            var Usuario = new Object();
+
+            //declarar las opciones del gráfico de barra
+            var options = {
+                chart: { renderTo: '@ViewBag.IdDiv', type: 'solidgauge' },
+                title: null,
+                pane: { center: ['50%', '50%'], size: '100%', startAngle: -90, endAngle: 90, background: { backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE', innerRadius: '60%', outerRadius: '100%', shape: 'arc' } },
+                tooltip: { enabled: false },
+                yAxis: { stops: [[0.1, '#01579b'], [0.5, '#1565c0'], [0.9, '#1976d2']], lineWidth: 0, minorTickInterval: null, tickAmount: 2, title: { y: -90 }, labels: { y: 2 } },
+                plotOptions: { solidgauge: { dataLabels: { y: 5, borderWidth: 0, useHTML: true } } }
+            };
+
+            var chartSpeed  = {
+                 yAxis: { min: 0, max: 100, title: { text: 'Rendimiento adquirido por ' + '@ViewBag.IdDiv' } },
+                 credits: { enabled: false },
+                 series: [{
+                     name: 'Rendimiento de' + '@ViewBag.IdDiv',
+                     data: [@string.Format("{0:n}", ViewBag.Rendimiento)],
+                     tooltip: { valueSuffix: ' Min/Tickets' },
+                     dataLabels: {
+                         format: '<div style="text-align:center; margin-top:-3.5rem;"><span style="font-size:18px; color:#424242">{y} %</span><br/>'
+                     },
+                 }]
+             };
+
+
+            //crear la grafica y agregar los series o puntos a gráficar
+            HighchartsGauge = new Highcharts.Chart(Highcharts.merge(options, chartSpeed));
+            $(".highcharts-container ").css("height", "400px");
+
+
+        }
+    });
+</script>

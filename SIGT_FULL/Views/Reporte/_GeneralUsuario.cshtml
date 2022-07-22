@@ -1,0 +1,49 @@
+﻿<h4>
+    <small class="pull-left" style="color:#9e9e9e"><i class="@ViewBag.Icon"></i> <b id="username">@ViewBag.Text</b></small>
+    <span class="clearfix"></span>
+</h4>
+
+<div class="col-md-3">
+    <div class="row">
+        <h3 style="color:#1976d2"><b id="TotalTicket">@string.Format("{0:n}", ViewBag.TotalTickets).Replace(".00", "") <small>tickets</small></b></h3>
+    </div>
+
+    <div class="row">
+        <h4 style="margin-top:-0.3rem"><b><small>Atendidos</small></b></h4>
+    </div>
+</div>
+
+
+<div class="col-md-3" style="padding-left:2rem">
+    <div class="row">
+        <h3 style="color:#1976d2"><b id="TotalWork">@string.Format("{0:n}", ViewBag.Tiempo) <small>Horas</small></b></h3>
+    </div>
+
+    <div class="row">
+        <h4 style="margin-top:-0.3rem"><b><small>Tiempo en atención</small></b></h4>
+    </div>
+</div>
+
+<div class="col-md-3" style="padding-left:2rem">
+    <div class="row">
+        <h3 style="color:#1976d2"><b id="TotalRequired">@string.Format("{0:n}", ViewBag.Tiempo) <small>Horas</small></b></h3>
+    </div>
+
+    <div class="row">
+        <h4 style="margin-top:-0.3rem"><b><small>Total de Tiempo requerido (5min cada ticket)</small></b></h4>
+    </div>
+</div>
+
+
+
+
+<div class="col-md-3" style="padding-left:2rem">
+    <div class="row">
+        <h3 style="color:#1976d2"><b id="ObtainedPerformance">@string.Format("{0:n}", ViewBag.rendimiento) <small>%</small></b></h3>
+    </div>
+
+    <div class="row">
+        <h4 style="margin-top:-0.3rem"><b><small>Rendimiento adquirido</small></b></h4>
+    </div>
+</div>
+

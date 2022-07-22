@@ -1,0 +1,75 @@
+﻿<script>
+    $(document).ready(function () {
+        _TotalTicket_Mensual();
+
+        //script que permite crear el diagram lineal de los tickets atendidos mensualementes
+        function _TotalTicket_Mensual() {
+            Highcharts.chart('containerMensual', {
+                chart: {
+                    type: 'line',
+                    renderTo: 'containerMensual',
+                    defaultSeriesType: 'areaspline',
+                    height: 450
+                },
+                title: {
+                    text: 'Valoración de tickets atendidos'
+                },
+                subtitle: {
+                    text: 'Total de tickets Mensuales del año ' + '@ViewBag.TotalMensual.Anno'
+                },
+                tooltip: {
+                    enabled: true,
+                    pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
+                },
+                xAxis: {
+                    categories: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+                },
+                yAxis: {
+                    title: {
+                        text: 'Números de tickets'
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: true
+                    }
+                },
+
+                series: [{
+                    name: 'Total de Tickets',
+                    data: [@ViewBag.TotalMensual.Enero, @ViewBag.TotalMensual.Febrero, @ViewBag.TotalMensual.Marzo, @ViewBag.TotalMensual.Abril, @ViewBag.TotalMensual.Mayo, @ViewBag.TotalMensual.Junio, @ViewBag.TotalMensual.Julio, @ViewBag.TotalMensual.Agosto, @ViewBag.TotalMensual.Septiembre, @ViewBag.TotalMensual.Octubre, @ViewBag.TotalMensual.Noviembre, @ViewBag.TotalMensual.Diciembre]
+                }, {
+                    name: 'Atendidos por mí',
+                    data: [@ViewBag.TotalMensual_Usuario.Enero, @ViewBag.TotalMensual_Usuario.Febrero, @ViewBag.TotalMensual_Usuario.Marzo, @ViewBag.TotalMensual_Usuario.Abril, @ViewBag.TotalMensual_Usuario.Mayo, @ViewBag.TotalMensual_Usuario.Junio, @ViewBag.TotalMensual_Usuario.Julio, @ViewBag.TotalMensual_Usuario.Agosto, @ViewBag.TotalMensual_Usuario.Septiembre, @ViewBag.TotalMensual_Usuario.Octubre, @ViewBag.TotalMensual_Usuario.Noviembre, @ViewBag.TotalMensual_Usuario.Diciembre]
+
+                }]
+            });
+
+        };
+
+
+        //para resolver problemas con el tabs vs highchart
+        //si se activa el evento click del tab de boostrap
+        //recargar nuevamente el highchart
+        jQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) { // on tab selection event
+            jQuery("#containerMensual").each(function () {
+                var chart = jQuery(this).highcharts(); // target the chart itself
+                chart.reflow() // reflow that chart
+            });
+        });
+
+
+    });
+
+
+    
+</script>
+
+
+<div id="containerMensual" style="z-index:-10; max-width:100%"></div>

@@ -1,0 +1,425 @@
+﻿@model IEnumerable<CapaEntidad.Ticket>
+
+@{
+    ViewBag.Title = "ModuloTicket";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+
+<script>
+    $(document).ready(function () {
+        $('#ListaTicket').DataTable({
+            "pageLength": 12,
+            "bInfo": true,
+            "bFilter": true,
+            "bPaginate": true,
+            "paging": true,
+            "ordering": false,
+            language: {
+                "search": "Filtrar Por:",
+                "info": "Mostrando _START_  al _END_  de _MAX_ registros",
+                "lengthMenu": "Mostrar _MENU_ Registros",
+                "sZeroRecords": "NO HAY TICKETS",
+                "sInfoEmpty": "Upss! no hay registros XD",
+                "infoFiltered": "(filtro de _MAX_ registros)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Atras"
+                },
+
+            },
+        });
+
+        
+    });
+</script>
+
+<div id="DialogCharge" style="display:none">
+    <h4 id="MessageCharge"><strong>Cargando información...</strong></h4>
+</div>
+
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagActual">Lista de Ticket</li>
+        </ol>
+    </section>
+</div>
+
+<div class="row contentype">
+    <fieldset class="table-responsive col-md-12">
+        <legend>
+            <strong>Ticket del día</strong>
+        </legend>
+        <div class="col-md-12" style="margin-bottom:25px">
+            <article class="pull-left" style="padding: 10px; background: #fafafa; border: dashed 1px #eeeeee; ">
+                <label style="margin-left:15px">
+                    <input type="radio" name="Estado" id="Estado1" class="Estado" value="1" checked>
+                    En espera
+                </label>
+                <label style="margin-left:35px">
+                    <input type="radio" name="Estado" id="Estado2" class="Estado" value="0">
+                    Anulados
+                </label>
+                <label style="margin-left:35px">
+                    <input type="radio" name="Estado" id="Estado3" class="Estado" value="4">
+                    Atendidos
+                </label>
+            </article>
+
+            <article class="pull-right">
+                <a href="@Url.Action("RegistrarTicket", "Turno", new { usuario = Session["User"].ToString() })" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Crear Ticket
+                </a>
+            </article>
+            <div class="clearfix"></div>
+        </div>
+
+        <table id="ListaTicket" class="stripe row-border hover" cellspacing="0" width="100%;" style="margin-top:45px">
+            <thead>
+                <tr>
+                    <th class="text-center">
+                        <strong>Ticket</strong>
+                    </th>
+                    <th class="text-center">
+                        <strong>Cliente</strong>
+                    </th>
+                    <th class="text-center">
+                        <strong>Fecha Solicitud</strong>
+                    </th>
+                    <th class="text-center">
+                        <strong>Estado</strong>
+                    </th>
+                    <th class="text-center">
+                        <strong>Prioridad</strong>
+                    </th>
+                    <th class="text-center">
+                        <strong>Acciones</strong>
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody id="ListaSolicitud">
+                @foreach (var item in Model)
+                {
+
+                    <tr>
+                        <td class="text-center">
+                            <a href="@Url.Action("VisualizarTicket", "Turno", new { Turno = item.Mov })">@Html.DisplayFor(modelItem => item.CodTicket)</a>
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.Cliente.NombreCompleto)
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.FechaSolicitud)
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.EstadoDesc)
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.PrioridadDesc)
+                        </td>
+                        <td class="text-center">
+                            <a href="@Url.Action("VisualizarTicket", "Turno", new { Turno = item.Mov })" class="btn btn-info btn-xs"><span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Visualizar Ticket"></span></a>
+                            <a href="#" class="btn btn-danger btn-xs accion" data-accion="0" data-id="@item.Mov" data-cod="@item.CodTicket" data-cliente="@item.Cliente.NombreCompleto"><span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="top" title='Cancelar Ticket'></span></a>
+                        </td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    </fieldset>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        //declarar variables
+        var Ticket, CodTicket, EstadoTicket, ClienteTicket;
+        var accion, usuario;
+
+        //si existe cambios en los radios button
+        $(".Estado").change(function () {
+            //obtener el valor del radio button, ya que en base a eso listaremos
+            //las ticket
+            accion = $(this).val();
+
+            //eliminar el datatable temporalmente
+            var table = $('#ListaTicket').DataTable();
+            table.destroy();
+
+            //usar ajax para comunicarse con el controlador
+            //y obtener la información de lista de ticket
+            $.ajax({
+                url: '@Url.Action("BuscarTicket", "Turno")' + "?Estado=" + accion,
+                beforeSend: function () {
+                    $("#DialogCharge").dialog({
+                        width: 300,
+                        height: 110,
+                        modal: true,
+                        show: "fadeIn",
+                        hide: "fadeOut",
+                        dragable: false
+                    });
+                },
+                success: function (result) {
+                    //agregar elementos a la tabla(#ListaTicket)
+                    strTable = "";
+                    //por cada elemento de la lista de solicitudes agregarlos al tbody de la table
+                    Enlace = '';
+                    $.each(result, function (i, value) {
+                        Enlace = '@Url.Action("VisualizarTicket", "Turno")' + "?Turno=" + value.Mov;
+                        strTable += "<tr>";
+                        strTable += "<td class='text-center'><a href='" + Enlace + "'>" + value.CodTicket + "</a></td>";
+                        strTable += "<td class='text-center'>" + value.Cliente.NombreCompleto + "</td>";
+                        strTable += "<td class='text-center'>" + value.FechaSolicitud + "</td>";
+                        strTable += "<td class='text-center'>" + value.EstadoDesc + "</td>";
+                        strTable += "<td class='text-center'>" + value.PrioridadDesc + "</td>";
+                        if (value.Estado == 0) {
+                            strTable += "<td class='text-center'><a href='" + Enlace + "' class='tn btn-info btn-xs'><span class='glyphicon glyphicon-eye-open' data-toggle='tooltip' data-placement='top' title='Visualizar Ticket'></span></a>    <a href='#' class='btn btn-warning btn-xs accion' data-accion='1' data-id='" + value.Mov + "' data-cod='" + value.CodTicket + "' data-cliente='" + value.Cliente.NombreCompleto + "'><span class='glyphicon glyphicon-pencil' data-toggle='tooltip' data-placement='top' title='Reactivar Ticket'></span></a></td>";
+                        }
+
+                        if (value.Estado == 1) {
+                            strTable += "<td class='text-center'><a href='" + Enlace + "' class='tn btn-info btn-xs'><span class='glyphicon glyphicon-eye-open' data-toggle='tooltip' data-placement='top' title='Visualizar Ticket'></span></a>    <a href='#' class='btn btn-danger btn-xs accion' data-accion='0' data-id='" + value.Mov + "' data-cod='" + value.CodTicket + "' data-cliente='" + value.Cliente.NombreCompleto + "'><span class='glyphicon glyphicon-remove' data-toggle='tooltip' data-placement='top' title='Cancelar Ticket'></span></a></td>";
+
+                        }
+
+                        if (value.Estado == 4) {
+                            strTable += "<td class='text-center'><a href='#' class='tn btn-info btn-xs'><span class='glyphicon glyphicon-eye-open' data-toggle='tooltip' data-placement='top' title='Visualizar Ticket'></span></a>  <a href='#' class='btn btn-default btn-xs accion' data-accion='4' data-id='" + value.Mov + "' data-cod='" + value.CodTicket + "' data-cliente='" + value.Cliente.NombreCompleto + "'><span class='glyphicon glyphicon glyphicon-ok' data-toggle='tooltip' data-placement='top' title='Nada Ticket'></span></a></td>";
+                        }
+
+                        strTable += "</tr>";
+                    });
+                    //agregar los valores obtendido al tbody
+                    $("#ListaSolicitud").html(strTable);
+
+                },
+                complete: function () {
+                    //cerrar dialogo
+                    $("#DialogCharge").dialog('close');
+
+                    //recrear datatable
+                    $('#ListaTicket').DataTable({
+                        "pageLength": 12,
+                        "bInfo": true,
+                        "bFilter": true,
+                        "bPaginate": true,
+                        "paging": true,
+                        "ordering": false,
+                        language: {
+                            "search": "Filtrar Por:",
+                            "info": "Mostrando _START_  al _END_  de _MAX_ registros",
+                            "lengthMenu": "Mostrar _MENU_ Registros",
+                            "sZeroRecords": "NO HAY TICKETS",
+                            "sInfoEmpty": "Upss! no hay registros XD",
+                            "infoFiltered": "(filtro de _MAX_ registros)",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Último",
+                                "next": "Siguiente",
+                                "previous": "Atras"
+                            },
+
+                        },
+                    });
+
+                    
+
+                }
+
+            });
+
+        });
+
+
+        //obtener la informacion del registro a partir del evento de un boton cancelar o reactivar
+        $("body").on("click", "a.accion", function (event) {
+            event.preventDefault();
+
+            Ticket = $(this).data("cod");
+            CodTicket = $(this).data("id");
+            EstadoTicket = $(this).data("");
+            ClienteTicket = $(this).data("cliente");
+            accion = $(this).data("accion");
+            usuario = '@Session["User"].ToString()';
+
+            //segun la accion a realizar configurar el mensaje del modal
+            switch (accion) {
+                case 4:
+                    $("#TitleAccion").html("<strong>Turno Atendido</strong>");
+                    $("#AccionDescripcion").html("<strong>Turno Atendido</strong>");
+                    $("#TicketCod").html("<strong>" + Ticket + "</strong>");
+                    $("#ticket").val(Ticket);
+                    $("#NombreCliente").html("<strong>" + ClienteTicket + "</strong>");
+                    $("#cliente").val(ClienteTicket);
+                    $("#Accion").html("Ticket atendido");
+                    $("#btn-EnviarDatos").removeClass("btn-warning");
+                    $("#btn-EnviarDatos").removeClass("btn-danger");
+                    $("#btn-EnviarDatos").addClass("btn-default");
+                    $("#btn-EnviarDatos").addClass("disabled");
+                    break;
+
+
+                case 0:
+                    $("#TitleAccion").html("<strong>Eliminar turno</strong>");
+                    $("#AccionDescripcion").html("<strong>Eliminar turno</strong>");
+                    $("#TicketCod").html("<strong>" + Ticket + "</strong>");
+                    $("#ticket").val(Ticket);
+                    $("#NombreCliente").html("<strong>" + ClienteTicket + "</strong>");
+                    $("#cliente").val(ClienteTicket);
+                    $("#Accion").html("Eliminar ticket");
+                    $("#btn-EnviarDatos").removeClass("btn-warning");
+                    $("#btn-EnviarDatos").removeClass("btn-default");
+                    $("#btn-EnviarDatos").removeClass("disabled");
+                    $("#btn-EnviarDatos").addClass("btn-danger");
+                    break;
+
+                case 1:
+                    $("#TitleAccion").html("<strong>Reactivar turno</strong>");
+                    $("#AccionDescripcion").html("<strong>Reactivar turno</strong>");
+                    $("#TicketCod").html("<strong>" + Ticket + "</strong>");
+                    $("#ticket").val(Ticket);
+                    $("#NombreCliente").html("<strong>" + ClienteTicket + "</strong>");
+                    $("#cliente").val(ClienteTicket);
+                    $("#Accion").html("Reactivar ticket");
+                    $("#btn-EnviarDatos").removeClass("btn-danger");
+                    $("#btn-EnviarDatos").removeClass("btn-default");
+                    $("#btn-EnviarDatos").removeClass("disabled");
+                    $("#btn-EnviarDatos").addClass("btn-warning");
+                    break;
+
+            }
+
+            //abrir el modal terminado la inserccion de valor al modal
+            $("#Modal-AccionTicket").modal({
+                show: "true"
+            });
+
+
+        });
+
+
+        //enviar los datos al controlador si existe una acción sobre el boton
+        $("#btn-EnviarDatos").click(function () {
+            //enviar los datos al controlador
+            $.ajax({
+                url: '@Url.Action("ActualizarTicket", "Turno")' + "?ID=" + CodTicket + "&CodTicket=" + Ticket + "&Valor=" + accion + "&Usuario=" + usuario,
+                 //mientras se envia la informacion al controlador realizar estas acciones
+                 beforeSend: function () {
+                      $("#Modal-AccionTicket").modal('hide');
+                      $("#DialogCharge").dialog({
+                            width: 300,
+                            height: 110,
+                            modal: true,
+                            show: "fadeIn",
+                            hide: "fadeOut",
+                            dragable: false
+                        });
+                 },
+                 //si existe respuesta, entonces rellenar esconder el modal y abrir otro
+                 success: function (data) {
+                     if (data == true) {
+                         $("#MessageState").html("<strong>Operación realizada con éxito</strong>");
+                     }
+
+                     if (data == false) {
+                         $("#MessageState").html("<strong>Problemas con la solicitud, por favor contacte al departamento de informática si el problema persiste</strong>");
+                     }              
+                 },
+                 //terminado el proceso, cerrar dialog y cargar modal statico
+                 complete: function () {
+                     $("#DialogCharge").dialog('close');
+                     $("#Modal-Message").modal({
+                         show: "true",
+                         backdrop: 'static',
+                         keyboard: false
+                     });             
+                  }
+              });
+        });
+
+
+
+    });
+</script>
+
+
+
+<!--Modal para realizar la accion de edicion de prioridad y baja del ticket-->
+<div class="modal modal-open fade" id="Modal-AccionTicket" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <button type="button" class="close cierramodal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 id="TitleAccion" class="modal-title" style="color:#000"></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <p class="text-center">
+                            Esta a punto de <span id="AccionDescripcion"></span> al ticket <span id="TicketCod"></span> del sr(a) <span id="NombreCliente">.</span>
+                            Si esta segur(a) de realizar la acción por favor confirmar.
+                        </p>
+                    </div>
+                </div>
+                <hr />
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Usuario Solicitante</label>
+                        <input type="text" class="form-control" id="user" name="user" value="@Session["User"].ToString()" readonly="readonly" style="font-size:18px; max-width:100%">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Cliente</label>
+                        <input type="text" class="form-control" id="cliente" name="cliente" readonly="readonly" style="font-size:18px; max-width:100%">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Ticket</label>
+                        <input type="text" class="form-control" id="ticket" name="ticket" readonly="readonly" style="font-size:18px; max-width:100%">
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default pull-left" id="btnCerrar" data-dismiss="modal">Cerrar</a>
+                <button id="btn-EnviarDatos" type="button"  class="btn btn-danger pull-right"> <span id="Accion"></span> </button>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="text-left notificacion" role="alert"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal mostrar los mensaje de alerta-->
+<div class="modal modal-open fade" id="Modal-Message" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <button type="button" class="close cierramodal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" style="color:#000"><strong>Estado de la operación</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h4 id="MessageState"></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="@Url.Action("ListaTicket", "Turno", new { usuario = Session["User"].ToString() })" class="btn btn-danger pull-right">Cerrar ventana</a>
+            </div>
+        </div>
+    </div>
+</div>

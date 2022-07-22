@@ -1,0 +1,155 @@
+﻿<script>
+    //script que permite crear el diagrama
+    //de tiempo promedio
+    $(document).ready(function () {
+        _Promedio_Atendido();
+        function _Promedio_Atendido() {
+            // Make monochrome colors
+            var pieColors = (function () {
+                var colors = [],
+                    base = Highcharts.getOptions().colors[0],
+                    i;
+
+                for (i = 0; i < 10; i += 1) {
+                    // Start out with a darkened base color (negative brighten), and end
+                    // up with a much brighter color
+                    colors.push(Highcharts.Color(base).brighten((i - 3) / 7).get());
+                }
+                return colors;
+            }());
+
+
+            //Highcharts.chart('containerPromedio', {
+            //    chart: {
+            //        zoomType: 'xy'
+            //    },
+            //    title: {
+            //        text: 'Promedio'
+            //    },
+
+            //    xAxis: [{
+            //        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            //            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+
+            //    }],
+            //    yAxis: [{
+            //        // primary yAxis bar
+            //        title: { text: 'Tiempo Obtenido' },
+            //        labels: {
+            //            format: '{value} min',
+            //            style: {
+            //                color: Highcharts.getOptions().colors[1]
+            //            }
+            //        },
+            //        opposite: false
+
+            //    }, { // secudary yAxis line
+            //        title: { text: 'Limites' },
+            //        labels: {
+            //            format: '{value} min',
+            //            style: {
+            //                color: Highcharts.getOptions().colors[1]
+            //            }
+            //        },
+            //        opposite: true
+            //    }],
+            //    tooltip: {
+            //        shared: true
+            //    },
+            //    legend: {
+            //        layout: 'vertical',
+            //        align: 'left',
+            //        x: 80,
+            //        verticalAlign: 'top',
+            //        y: 55,
+            //        floating: true,
+            //        backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+            //    },
+            //    series: [{
+            //        name: 'Tiempo',
+            //        type: 'column',
+            //        yAxis: 1,
+            //        data: [24, 15, 7, 8, 2, 2, 15, 25, 7, 12, 14, 8],
+            //        tooltip: {
+            //            valueSuffix: ' min'
+            //        }
+
+            //    }, {
+            //        name: 'Máximo',
+            //        type: 'line',
+            //        data: [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18],
+            //        dashStyle: 'shortdot',
+            //        tooltip: {
+            //            valueSuffix: ' min'
+            //        }
+            //    }, {
+            //        name: 'Mínimo',
+            //        type: 'line',
+            //        data: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+            //        dashStyle: 'shortdot',
+            //        tooltip: {
+            //            valueSuffix: ' min'
+            //        }
+
+            //    }]
+            //});
+
+
+
+            Highcharts.chart('containerPromedio', {
+                title: {
+                    text: 'Promedio mensual correspondiente al mes de '
+                },
+                xAxis: {
+                    categories: ['tramites de préstamos', 'Consulta', 'OTROS', 'rrhh']
+                },
+                colors: ['#207ce5', '#49a5bf', '#187996', '#6d0019', '#6d0019', '#6d0019'],
+                series: [{
+                    type: 'column',
+                    name: 'Jane',
+                    data: [2.15, 4, 2, 10]
+                }, {
+                    type: 'column',
+                    name: 'John',
+                    data: [8, 15, 10, 12]
+                }, {
+                    type: 'column',
+                    name: 'Joe',
+                    data: [15, 14, 12, 15]
+                }, {
+                    type: 'line',
+                    name: 'MAXIMO',
+                    data: [8, 4, 8, 17],
+                    marker: {
+                        lineWidth: 5,
+                        lineColor: Highcharts.getOptions().colors[3],
+                        fillColor: 'white'
+                    }
+                }, {
+                    type: 'line',
+                    name: 'MINIMO',
+                    data: [1, 1, 1, 1],
+                    marker: {
+                        lineWidth: 5,
+                        lineColor: Highcharts.getOptions().colors[2],
+                        fillColor: 'white'
+                    }
+                }]
+            });
+
+        };
+
+        
+
+        //para resolver problemas con el tabs vs highchart
+        //si se activa el evento click del tab de boostrap
+        //recargar nuevamente el highchart
+        jQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) { // on tab selection event
+            jQuery("#containerPromedio").each(function () {
+                var chart = jQuery(this).highcharts(); // target the chart itself
+                chart.reflow() // reflow that chart
+            });
+        });
+    });
+</script>
+<div id="containerPromedio" style="z-index:-10"></div>

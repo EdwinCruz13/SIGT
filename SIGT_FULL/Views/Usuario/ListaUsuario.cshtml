@@ -1,0 +1,761 @@
+﻿@model IEnumerable<CapaEntidad.Usuario>
+
+@{
+    ViewBag.Title = "ListaUsuario";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+<script>
+    $(document).ready(function () {
+        $('.ListaUsuarios').DataTable({
+            "scroller": true,
+            "deferRender": true,
+            "lengthChange": false,
+            "pageLength": 25,
+            "bInfo": true,
+            "bFilter": true,
+            "bPaginate": false,
+            "paging": false,
+            "ordering": false,
+            "scrollY": "450px",
+            "scrollCollapse": true,
+            "fixedColumns": true,
+            language: {
+                "search": "Filtrar Por:",
+                "info": "Mostrando _TOTAL_ registros",
+                "lengthMenu": "Mostrar _MENU_ Registros",
+                "sZeroRecords": "NO HAY USUARIOS",
+                "sInfoEmpty": "Upss! no hay registros XD",
+
+            },
+        });
+
+        //reparar los errores graficos entre el datatable y los tabs
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $($.fn.dataTable.tables(true)).DataTable()
+                .columns.adjust()
+                    .fixedColumns().relayout();
+        });
+    });
+
+    
+</script>
+
+
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagActual">Lista de usuarios</li>
+        </ol>
+    </section>
+</div>
+
+<div class="row contentype">
+    <section class="col-md-12">
+        <a class='btn btn-success pull-right' href='@Url.Action("CrearUsuario", "Usuario")' id='btn-Crear'>Crear Usuario <span class='glyphicon glyphicon-plus'></span></a>
+    </section>
+</div>
+
+
+
+<div class="row contentype">
+    <section class="col-md-12" style="margin-bottom:25px">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation"><a href="#Recuperaciones" aria-controls="Recuperaciones" role="tab" data-toggle="tab">Recuperaciones</a></li>
+            <li role="presentation" class="active"><a href="#Prestamos" aria-controls="Prestamos" role="tab" data-toggle="tab">Préstamos</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane" id="Recuperaciones" style="margin-top:25px">
+                <table class="table stripe compact row-border hover ListaUsuarios" cellspacing="0" width="98%">
+                    <thead>
+                        <tr>
+                            <th>
+                                <strong>Cuenta</strong>
+                            </th>
+
+                            <th>
+                                <strong>Usuario</strong>
+                            </th>
+
+                            <th>
+                                <strong>Perfil</strong>
+                            </th>
+
+                            <th>
+                                <strong>Estado</strong>
+                            </th>
+
+                            <th class="text-center">
+                                <strong>ACCIONES</strong>
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            //listar a recuperaciones
+                            if (item.Area.IdZona == "02")
+                            {
+                                <tr>
+                                    <td>
+                                        <img id="foto-sesion" src="@Url.Content("~/Images/Icons/user.png")" />
+                                        <a href="@Url.Action("DetalleUsuario", "Usuario", new { usuario = item.Cuenta })">@Html.DisplayFor(modelItem => item.Cuenta)</a>
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.NombreCompleto)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Perfil.NombrePerfil)
+                                    </td>
+
+                                    <td>
+                                        @if (item.Estado == 1)
+                                        {
+                                            <strong>Activo</strong>
+                                        }
+                                        @if (item.Estado == 0)
+                                        {
+                                            <strong>Inactivo</strong>
+                                        }
+                                    </td>
+
+
+                                    <td class="text-center">
+                                        <a href="#" class="btn btn-xs btn-info btnDetalle" data-toggle="tooltip" data-placement="left" title="Detalles de usuario" style="margin-left:10px" data-user="@item.Cuenta">
+                                            <span class="glyphicon glyphicon-th-list"></span> Detalle
+                                        </a>
+                                        <a href="#" class="btn btn-xs btn-warning btnEdicion" data-toggle="tooltip" data-placement="left" title="Editar usuario" style="margin-left:10px" data-user="@item.Cuenta">
+                                            <span class="glyphicon glyphicon-pencil"></span> Editar
+                                        </a>
+
+                                        @if (item.Estado == 1)
+                                        {
+                                            <a href="#" class="btn btn-xs btn-danger btnEstado" data-toggle="tooltip" data-placement="left" title="Baja usuario" style="margin-left:10px" data-proceso="0" data-usuario="@item.Cuenta" data-nombre="@item.NombreCompleto">
+                                                <span class="glyphicon glyphicon-remove"></span> Inhabilitar
+                                            </a>
+                                        }
+
+                                        @if (item.Estado == 0)
+                                        {
+                                            <a href="#" class="btn btn-xs btn-success btnEstado" data-toggle="tooltip" data-placement="left" title="Alta usuario" style="margin-left:10px" data-proceso="1" data-usuario="@item.Cuenta" data-nombre="@item.NombreCompleto">
+                                                <span class="glyphicon glyphicon-ok"></span> Habilitar 
+                                            </a>
+                                        }
+
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+
+
+            <div role="tabpanel" class="tab-pane active" id="Prestamos" style="margin-top:25px">
+                <table class="table stripe compact row-border hover ListaUsuarios" cellspacing="0" width="98%">
+                    <thead>
+                        <tr>
+                            <th>
+                                <strong>Cuenta</strong>
+                            </th>
+                            <th>
+                                <strong>Usuario</strong>
+                            </th>
+
+                            <th>
+                                <strong>Perfil</strong>
+                            </th>
+
+                            <th>
+                                <strong>Estado</strong>
+                            </th>
+
+                            <th class="text-center">
+                                <strong>ACCIONES</strong>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            //listar a prestamos y asociados
+                            if (item.Area.IdZona == "01" || item.Area.IdZona == "03")
+                            {
+                                <tr>
+                                    <td>
+                                        <img id="foto-sesion" src="@Url.Content("~/Images/Icons/user.png")" />
+                                        <a href="#" class="btnDetalle">@Html.DisplayFor(modelItem => item.Cuenta)</a>
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.NombreCompleto)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Perfil.NombrePerfil)
+                                    </td>
+                                    <td>
+                                        @if (item.Estado == 1)
+                                        {
+                                            <strong>Activo</strong>
+                                        }
+                                        @if (item.Estado == 0)
+                                        {
+                                            <strong>Inactivo</strong>
+                                        }
+                                    </td>
+
+
+                                    <td class="text-center">
+                                        <a href="#" class="btn btn-xs btn-info btnDetalle" data-toggle="tooltip" data-placement="left" title="Detalles de usuario" style="margin-left:10px" data-user="@item.Cuenta">
+                                            <span class="glyphicon glyphicon-th-list"></span> Detalle
+                                        </a>
+                                        <a href="#" class="btn btn-xs btn-warning btnEdicion" data-toggle="tooltip" data-placement="left" title="Editar usuario" style="margin-left:10px" data-user="@item.Cuenta">
+                                            <span class="glyphicon glyphicon-pencil"></span> Editar
+                                        </a>
+
+                                        @if (item.Estado == 1)
+                                        {
+                                            <a href="#" class="btn btn-xs btn-danger btnEstado" data-toggle="tooltip" data-placement="left" title="Baja usuario" style="margin-left:10px" data-proceso="0" data-usuario="@item.Cuenta" data-nombre="@item.NombreCompleto">
+                                                <span class="glyphicon glyphicon-remove"></span> Inhabilitar
+                                            </a>
+                                        }
+
+                                        @if (item.Estado == 0)
+                                        {
+                                            <a href="#" class="btn btn-xs btn-success btnEstado" data-toggle="tooltip" data-placement="left" title="Alta usuario" style="margin-left:10px" data-proceso="1" data-usuario="@item.Cuenta" data-nombre="@item.NombreCompleto">
+                                                Habilitar <span class="glyphicon glyphicon-ok"></span>
+                                            </a>
+                                        }
+
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+<!--Modal para habilitar cuentas de usuarios-->
+<div class="modal modal-open fade" id="Modal-EstadoCuenta" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Estado de Usuario</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h4 class="text-justify"><strong>Esta a punto de <span id="txt-Activacion"></span> la cuenta de usuario de <span id="txt-Usuario"></span> correspondiente a <span id="txt-Nombre"></span>. ¿Desea continuar con la acción?</strong></h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <h4 id="MessageError_Validate" style="color:#a84646" class="pull-left"></h4>
+                <a href="#" class="btn btn-default pull-left" id="btnCerrar" data-dismiss="modal">Cerrar</a>
+                <a href="#" class="btnAceptado btn btn-danger pull-right" id="btnAtencion">Desactivar cuenta</a>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal message-->
+<div class="modal modal-open fade" id="Modal-Message" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Estado de Usuario</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h4 class="text-justify message"></h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <h4 id="MessageError_Validate" style="color:#a84646" class="pull-left"></h4>
+                <a href="@Url.Action("ListaUsuario","Usuario", new { usuario = Session["User"].ToString() })" class="btn btn-success pull-right" id="btnAtencion">Finalizar</a>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--Modal para realizar observar la informacion del usuario-->
+<div class="modal modal-open fade" id="Modal-DetalleUsuario" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <button type="button" class="close cierramodal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 id="TitleAccion" class="modal-title" style="color:#000"><strong>Información del usuario</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-5">
+                    <div class="form-group" id="img-container">
+                        <center><img src="@Url.Content("~/Images/Icons/PerfilUsuario.png")" alt="ImagenCuenta" class="img-responsive" /></center>
+                    </div>
+                    <div class="form-group">
+                        <h4 id="nombre" class="text-center" style="font-weight:bold"><strong>{ESTADO}</strong></h4>
+                    </div>
+                    <div class="form-group">
+                        <h5 id="cedula" class="text-center"><strong>{Cedula}</strong></h5>
+                    </div>
+                    <div class="form-group">
+                        <h5 id="estadoCuenta" class="text-center"><strong>{ESTADO}</strong></h5>
+                    </div>
+                   
+                </div>
+
+                <div class="col-md-7">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Cuenta Asignada</label>
+                            <input type="text" class="form-control" id="usuario" name="usuario" readonly="readonly" style="font-size:18px; max-width:100%; background:#fff">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Perfil</label>
+                            <input type="text" class="form-control" id="perfil" name="perfil" readonly="readonly" style="font-size:18px; max-width:100%; background:#fff">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Área</label>
+                            <input type="text" class="form-control" id="zona" name="zona" readonly="readonly" style="font-size:18px; max-width:100%; background:#fff">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Tipo de usuario</label>
+                            <input type="text" class="form-control" id="tipo" name="tipo" readonly="readonly" style="font-size:18px; max-width:100%; background:#fff">
+                        </div>
+                    </div>
+
+                    
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default pull-left" id="btnCerrar" data-dismiss="modal">Cerrar</a>
+                <button id="btn-EnviarDatos" type="button" class="btn btn-warning pull-right">Editar</button>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="text-left notificacion" role="alert"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!--Modal para la edición de cuenta de usuario-->
+<div class="modal modal-open fade" id="Modal-EditarUsuario" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <button type="button" class="close cierramodal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 id="TitleAccion" class="modal-title" style="color:#000"><strong>Información del usuario a editar</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-5">
+                    <div class="form-group" id="img-container">
+                        <center><img src="@Url.Content("~/Images/Icons/PerfilUsuario.png")" alt="ImagenCuenta" class="img-responsive" /></center>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Cuenta Asignada</label>
+                            <input type="text" class="form-control" id="Eusuario" name="usuario" readonly="readonly" style="font-size:18px; max-width:100%;">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Contraseña</label>
+                            <input type="text" class="form-control" id="Econtrasena" name="Econtrasena" style="font-size:18px; max-width:100%;">
+                        </div>
+                    </div>
+
+                    
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">IP</label>
+                            <input type="text" class="form-control" id="Eip" name="Eip" style="font-size:18px; max-width:100%; background:#fff">
+                        </div>
+                    </div>
+                   
+                    
+                    <div class="form-group">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <label class="control-label">Estado</label>
+                                <select class="form-control" id="Eestado">
+                                    <option value="1" selected="selected">Activo</option>
+                                    <option value="0">Inactivo</option>
+                                </select>
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-7">
+                    
+                    <div class="form-group">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <label class="control-label">Nombre completo</label>
+                                <input type="text" class="form-control" id="Enombre" name="Enombre" style="font-size:18px; max-width:100%; background:#fff">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <label class="control-label">Cédula de identidad</label>
+                                <input type="text" class="form-control" id="Ecedula" name="Ecedula" style="font-size:18px; max-width:100%; background:#fff">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Perfil</label>
+                            <select class="form-control" id="Eperfil" style="font-size:18px; max-width:100%; background:#fff"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Área</label>
+                            <select class="form-control" id="Ezona" style="font-size:18px; max-width:100%; background:#fff"></select>
+                            
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Tipo de usuario</label>
+                            <select class="form-control" id="Etipo" style="font-size:18px; max-width:100%; background:#fff"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label class="control-label">CodEmpleado</label>
+                            <input type="text" class="form-control" id="Ecod" name="Ecod" style="font-size:18px; max-width:100%; background:#fff">
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+          
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default pull-left" id="btnCerrar" data-dismiss="modal">Cerrar</a>
+                <button id="btn-EnviarEditar" type="button" class="btn btn-warning pull-right">Editar</button>
+                <div id="BlockError" class="form-group col-md-12" style="display:none">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 id="add_err"></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal de mensaje una vez que haya creado el usuarios-->
+<div class="modal modal-open fade" id="Modal-UsuarioCreado" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <h3 class="modal-title" style="color: #000"><strong>Control de usuario</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h4 class="text-justify"><strong>Se ha Editado correctamente al Usuario.</strong></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        //evento click para el boton detalle
+        //de la cuenta de usuario
+        $(".btnDetalle").click(function () {
+            //obtener la informacioón del usuario
+            //usando el ajax
+            $.ajax({
+                url: '@Url.Action("DetalleUsuario", "Usuario")' + "?usuario=" + $(this).data('user'),
+                success: function (response) {
+                    //obtenido los datos del controlador
+                    //rellenar el formulario que se encuentra en el modal
+                    $("#usuario").val(response.Cuenta);
+                    $("#perfil").val(response.Perfil.NombrePerfil);
+                    $("#zona").val(response.Area.Descripcion);
+                    $("#tipo").val(response.Tipo.TipoUsuario);
+                    area = (response.Estado == 1) ? "ACTIVO" : "INACTIVO";
+                    $("#estadoCuenta").html(area);
+                    $("#nombre").html(response.NombreCompleto);
+                    $("#cedula").html(response.CedulaIdentidad + " | " + response.CodEmpleado);
+
+
+                },
+                complete: function () {
+                    //abrir modal para observar la información del
+                    //usuario
+                    $("#Modal-DetalleUsuario").modal({
+                        show: "true",
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                }
+            });
+        });
+
+
+
+        //evento click para el boton de edicion
+        //de la cuenta de usuario
+        $(".btnEdicion").click(function () {
+            //obtener la informacioón del usuario
+            //usando el ajax
+            $.ajax({
+                url: '@Url.Action("DetalleUsuario", "Usuario")' + "?usuario=" + $(this).data('user'),
+                success: function (response) {
+                    //obtenido los datos del controlador
+                    //rellenar el formulario que se encuentra en el modal
+                    $("#Eusuario").val(response.Cuenta);
+                    $("#Enombre").val(response.NombreCompleto);
+                    $("#Ecedula").val(response.CedulaIdentidad);
+                    $("#Eip").val(response.IP);
+                    $("#Econtrasena").val(response.Contrasena);
+                    $("#Ecod").val(response.CodEmpleado);
+
+                    //Obtener la lista de areas disponibles,
+                    //Usar ajax - _ - -__-
+                    $.ajax({
+                       url: '@Url.Action("CatalogoZona", "Turno")',
+                       success: function (data) {
+                           zona = "";
+                           //usar el ciclo
+                           $.each(data, function (i, value) {
+                               if (value.Value == response.Area.IdZona)
+                                   zona += "<option value='" + value.Value + "' selected='selected'>" + value.Text + "</option>";
+                               else
+                                   zona += "<option value='" + value.Value + "'>" + value.Text + "</option>";
+                           });
+                           $("#Ezona").html(zona);
+                       }
+                    });
+
+                    //Obtener la lista de perfiles disponibles,
+                    //Usar ajax - _ - -__-
+                    $.ajax({
+                       url: '@Url.Action("CatalogoPerfiles", "Perfiles")',
+                       success: function (data) {
+                           perfil = "";
+                           //usar el ciclo
+                           $.each(data, function (i, value) {
+                               if (value.IdPerfil == response.Perfil.IdPerfil)
+                                   perfil += "<option value='" + value.IdPerfil + "' selected='selected'>" + value.NombrePerfil + "</option>";
+                               else
+                                   perfil += "<option value='" + value.IdPerfil + "'>" + value.NombrePerfil + "</option>";
+                           });
+                           $("#Eperfil").html(perfil);
+                       }
+                    });
+
+
+                    //Obtener la lista de tipo de usuario disponibles,
+                    //Usar ajax - _ - -__-
+                    $.ajax({
+                       url: '@Url.Action("CatalogoTipo_Usuario", "Perfiles")',
+                       success: function (data) {
+                           tipo = "";
+                           //usar el ciclo
+                           $.each(data, function (i, value) {
+                               if (value.IdTipo == response.Tipo.IdTipo)
+                                   tipo += "<option value='" + value.IdTipo + "' selected='selected'>" + value.TipoUsuario + "</option>";
+                               else
+                                   tipo += "<option value='" + value.IdTipo + "'>" + value.TipoUsuario + "</option>";
+                           });
+                           $("#Etipo").html(tipo);
+                       }
+                   });
+                },
+
+                complete: function () {
+                    //abrir modal para observar la información del
+                    //usuario
+                    $("#Modal-EditarUsuario").modal({
+                        show: "true",
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                }
+            });
+
+
+            //evento click
+            $("#btn-EnviarEditar").click(function () {
+                //agregar el area a un objeto zona
+                var _Zona = {
+                    IdZona: $("#Ezona").val()
+                };
+
+                var _Perfil = {
+                    IdPerfil: $("#Eperfil").val()
+                };
+
+                var _Tipo = {
+                    IdTipo: $("#Etipo").val()
+                };
+                //crear el objeto
+                var _Usuario = {
+                    Area: _Zona, Tipo: _Tipo, Perfil: _Perfil,
+                    Cuenta: $("#Eusuario").val(), Contrasena: $("#Econtrasena").val(), Estado: $("#Eestado").val(),
+                    CedulaIdentidad: $("#Ecedula").val(), NombreCompleto: $("#Enombre").val(), IP: $("#Eip").val(),
+                    CodEmpleado: $("#Ecod").val()
+                }
+
+
+                //usar ajax para enviar la solicitud al controladors
+                $.ajax({
+                       url: '@Url.Action("EditarUsuario", "Usuario")',
+                       data: JSON.stringify(_Usuario), //serializar a json
+                       type: "POST", //verbo definido post
+                       //se enviará el formato tipo json
+                       contentType: "application/json;charset=utf-8",
+                       dataType: "json",
+                       success: function (data) {
+                           //valorar las respuesta del controlador
+                           if (data == true) {
+                               //cerrar modal
+                               $('#Modal-EditarUsuario').modal('hide');
+                               //abrir el modal para la asignacion del ticket
+                                $("#Modal-UsuarioCreado").modal({
+                                    show: "true",
+                                    backdrop: 'static',
+                                    keyboard: false
+                                });
+
+                                //despues de un tiempo, cerrar modal y redireccionar
+                                setTimeout(function () {
+
+                                    // si la respuesta es true, redireccionar
+                                    window.location.href = '@Url.Action("ListaUsuario", "Usuario")' + "?usuario=" + '@Session["User"].ToString()';
+                                }, 2000);
+                           }
+
+
+                           if (response == false) {
+                               $("#add_err").html("Problemas con la actualizacion de los datos.");
+                               $("#BlockError").css("display", "block");
+                           }
+
+
+                       }
+                });
+            });
+
+        });
+
+        ///evento para la edicion de usuarios
+        $(".btnEstado").click(function () {
+            proceso = $(this).data("proceso");
+            usuario = $(this).data("usuario");
+            nombre = $(this).data("nombre");
+
+            
+
+            //agregar la información al modal
+            $("#txt-Usuario").html(usuario);
+            $("#txt-Nombre").html(nombre);
+            if (proceso == 1)
+                $("#txt-Activacion").html("Activar");
+
+            if (proceso == 0)
+                $("#txt-Activacion").html("Desactivar");
+
+
+            //abrir modal
+            $("#Modal-EstadoCuenta").modal({
+                show: "true",
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            //Usar ajax para comunicarse al controlador
+            $(".btnAceptado").click(function () {
+                alert(usuario);
+
+                 $.ajax({
+                    url: '@Url.Action("EstadoCuenta", "Usuario")' + "?usuario=" + usuario + "&proceso=" + proceso, //controlador + parametro
+                    //verificar la respuesta si existe respuesta por el controlador
+                    success: function (data) {
+                        //ocultar el modal y abrir el otro con el mensaje de la accion realizada
+                        $("#Modal-EstadoCuenta").modal('hide');
+                        //abrir modal
+                        if (data == "true" || data == true) {
+                            $(".message").html("Se ha completado las acciones sobre el usuario " + usuario);
+                        }
+                        else {
+                            $(".message").html("Problemas sobre la acción a realizar: " + data);
+                        }
+                        $("#Modal-Message").modal({
+                            show: "true",
+                            backdrop: 'static',
+                            keyboard: false
+                        });
+                    }
+                });
+            });
+
+        });
+
+    });
+</script>
+
+

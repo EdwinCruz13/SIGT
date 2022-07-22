@@ -1,0 +1,61 @@
+﻿@model CapaEntidad.Usuario
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_PublicLayout.cshtml";
+}
+
+@using (Ajax.BeginForm("Login", "Home", new AjaxOptions { HttpMethod = "POST", OnSuccess = "Resultado" }, new { @style = "margin-top:80px", @class = "container" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal col-xs-12 col-sm-offset-3 col-sm-7 col-md-offset-4 col-md-7 col-lg-offset-4 col-lg-5" style="margin-top:50px;">
+        <h2>Acceder a cuenta de usuario</h2>
+        <input type="hidden" id="IP" name="IP" value=@ViewBag.IP />
+        <hr />
+        <article class="col-md-12">
+            <div class="form-group col-md-12">
+                <div class="col-md-12 input-group">
+                    <span class="input-group-addon" style="font-size:14px"><span class="glyphicon glyphicon-user"></span></span>
+                    @Html.TextBoxFor(m => m.Cuenta, new { @id = "user", @class = "form-control", @placeholder = "Ingrese el Usuario", @style="max-width:100%"})
+                </div>
+            </div>
+            <div class="form-group col-md-12">
+                <div class="col-md-12 input-group">
+                    <span class="input-group-addon" style="font-size:14px"><span class="glyphicon glyphicon-ok"></span></span>
+                    @Html.PasswordFor(m => m.Contrasena, new { @id = "pass", @class = "form-control", @placeholder = "Ingrese la contraseña", @style = "max-width:100%" })
+                </div>
+            </div>
+
+            <div class="form-group col-md-12">
+                <div class="col-md-12 input-group">
+                    <button type="submit" class="btn btn-primary col-md-12">Iniciar sesión</button>
+                </div>
+            </div>
+
+            
+
+            <div id="BlockError" class="form-group col-md-12" style="display:none">
+                <div class="col-md-10 alert alert-danger" role="alert">
+                    <h4 id="add_err"></h4>
+                </div>
+            </div>
+        </article>
+    </div>
+
+}
+
+<script type="text/javascript">
+    function Resultado(response) {
+        if (response == false || response == "false") {
+            $("#add_err").html("No es posible iniciar sesión, por favor verifica tus credenciales.");
+            $("#BlockError").css("display","block");
+        }
+        else{
+            // si la respuesta es true, redireccionar una vez creada la sesion
+            window.location.href = '@Url.Action("ModuloAtencion", "Atencion")' + "?usuario=" + response.Cuenta;
+        }
+
+     }
+</script>
+
+

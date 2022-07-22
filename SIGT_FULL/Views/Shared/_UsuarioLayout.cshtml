@@ -1,0 +1,236 @@
+﻿@{
+    //El siguiente script permite detectar los permisos de usuario en base a la cuenta y su perfil
+    CapaNegocio.Permisos NAcceso = new CapaNegocio.Permisos();
+    string strAcceso = "";
+}
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SIGT</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if ($(".Opcion .item").hasClass('disabled') == true)
+                $(".Opcion").css("cursor", "not-allowed");
+
+            else 
+                $(".Opcion").css("cursor", "pointer");
+            
+        });
+    </script>
+
+</head>
+<body>
+    <nav id="topPanel" class="col-md-12 navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#TargetCollapse" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="@Url.Action("Index", "Usuario")">
+                    <h4 class="pull-left visible-lg visible-md" style="color:#fff; font-weight:bold;margin:0">Sistema de gestión de turno</h4>
+                    <h6 class="pull-left visible-xs visible-sm" style="color:#fff; font-weight:bold;margin:0">Sistema de gestión de turno</h6>
+                    <div class="clearfix"></div>
+                </a>
+            </div>
+
+            <!--esta seccion se activa cuando la pantalla sea una tablet o un movil-->
+            <div class="collapse navbar-collapse" id="TargetCollapse" role="navigation">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown visible-md visible-lg">
+                        <a class="desplegables dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <img src="@Url.Content("~/Images/Icons/user.png")" width="23" height="23" />
+                            <span style="color:#fff"><strong>@Session["Name"] <span class="caret"></span></strong></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#"><strong>@Session["Profile"]</strong></a></li>
+                            <li class="divider"></li>
+                            <li><a href="@Url.Action("Logout","Home")">Cerrar sesión</a></li>
+                        </ul>
+                    </li>
+
+
+                    <li class="visible-xs visible-sm">
+                        <a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })" style="color:#fff">
+                            <img src="@Url.Content("~/Images/Icons/dashboard.png")" width="14" height="14" style="margin-top:-3px" />
+                            <strong> Inicio</strong>
+                        </a>
+                    </li>
+
+                    <li class="visible-xs visible-sm">
+                        <a href="@Url.Action("ListaEstacion", "Atencion", new { usuario = Session["User"].ToString() })" style="color:#fff">
+                            <img src="@Url.Content("~/Images/Icons/carnet.png")" width="14" height="14" style="margin-top:-3px" />
+                            <strong> Activación de estaciones</strong>
+                        </a>
+                    </li>
+
+                    <li class="visible-xs visible-sm">
+                        <a href="@Url.Action("ModuloAtencion", "Atencion", new { usuario = Session["User"].ToString() })" style="color:#fff">
+                            <img src="@Url.Content("~/Images/Icons/carnet.png")" width="14" height="14" style="margin-top:-3px" />
+                            <strong> Atención al público</strong>
+                        </a>
+                    </li>
+
+                    <li class="visible-xs visible-sm">
+                        <a href="@Url.Action("ListaTicket", "Turno", new { usuario = Session["User"].ToString() })" style="color:#fff">
+                            <img src="@Url.Content("~/Images/Icons/ticket.png")" width="14" height="14" style="margin-top:-3px" />
+                            <strong> Ticket</strong>
+                        </a>
+                    </li>
+
+                  
+
+                </ul>
+            </div> <!--Fin de collapse-->
+        </div>
+    </nav>
+
+    <nav id="leftPanel" class="col-md-2">
+        <div class="row contentype visible-md visible-lg">
+            <center>
+                <ol class="breadcrumb">
+                    <li><a href="#" class="text-center">@Session["Profile"]</a></li>
+                </ol>
+            </center>
+        </div>
+        <section class="visible-lg visible-md" style="margin-top: -15px;">
+            <div id="Opc_Prim">
+                <article class="col-md-12 Opcion" style="margin-top: 5px; border-top: solid 1px rgba(255,255,255,0.1)">
+                    <a class="btn item" href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })" style="">
+                        <img src="@Url.Content("~/Images/Icons/dashboard.png")" class="pull-left" />
+                        <span class="pull-left">Inicio</span>
+                    </a>
+                </article>
+
+                <article class="col-md-12 Opcion">
+                    @{ strAcceso = (NAcceso.AccesoModulos(Session["User"].ToString(), "04-01") == false) ? "disabled" : ""; }
+                    <a id="AtencionCliente" class="btn item @strAcceso" href="@Url.Action("ListaEstacion", "Atencion", new { usuario = Session["User"].ToString() })">
+                        <img src="@Url.Content("~/Images/Icons/estaciones.png")" class="pull-left" />
+                        <span class="pull-left">Activación de estaciones</span>
+                    </a>
+                </article>
+
+                <article class="col-md-12 Opcion">
+                    @{ strAcceso = (NAcceso.AccesoModulos(Session["User"].ToString(), "04-05") == false) ? "disabled" : ""; }
+                    <a id="AtencionCliente" class="btn item @strAcceso" href="@Url.Action("ModuloAtencion", "Atencion", new { usuario = Session["User"].ToString() })">
+                        <img src="@Url.Content("~/Images/Icons/carnet.png")" class="pull-left" />
+                        <span class="pull-left">Atención al público</span>
+                    </a>
+                </article>
+
+                <article class="col-md-12 Opcion">
+                    @{ strAcceso = (NAcceso.AccesoModulos(Session["User"].ToString(), "03-01") == false) ? "disabled" : ""; }
+                    <a class="btn item @strAcceso" href="@Url.Action("RegistrarTicket", "Turno", new { usuario = Session["User"].ToString() })">
+                        <img src="@Url.Content("~/Images/Icons/plus.png")" class="pull-left" />
+                        <span class="pull-left">Crear Tickets</span>
+                    </a>
+                </article>
+
+                <article class="col-md-12 Opcion">
+                    @{ strAcceso = (NAcceso.AccesoModulos(Session["User"].ToString(), "03-01") == false) ? "disabled" : ""; }
+                    <a class="btn item @strAcceso" href="@Url.Action("ListaTicket", "Turno", new { usuario = Session["User"].ToString() })">
+                        <img src="@Url.Content("~/Images/Icons/ticket.png")" class="pull-left" />
+                        <span class="pull-left">Listado de Tickets</span>
+                    </a>
+                </article>
+
+                
+
+
+
+
+                <article class="col-md-12 Opcion">
+                    <a class="btn item" data-toggle="collapse" href="#MenuUsuario">
+                        <img src="@Url.Content("~/Images/Icons/acceso.png")" class="pull-left" />
+                        <span class="pull-left">Config. de accesos</span>
+                    </a>
+                    <div id="MenuUsuario" class="collapse">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                @{ strAcceso = (NAcceso.AccesoModulos(Session["User"].ToString(), "01-01") == false) ? "disabled" : ""; }
+                                <a class="btn item @strAcceso" href="@Url.Action("ListaUsuario", "Usuario", new { usuario = Session["User"].ToString() })">
+                                    <img src="@Url.Content("~/Images/Icons/ConfigUsuario.png")" class="pull-left" />
+                                    <span class="pull-left">Lista de usuarios</span>
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                @{ strAcceso = (NAcceso.AccesoModulos(Session["User"].ToString(), "02-01") == false) ? "disabled" : ""; }
+                                <a class="btn item @strAcceso" href="#">
+                                    <img src="@Url.Content("~/Images/Icons/perfil.png")" class="pull-left" />
+                                    <span class="pull-left">Lista de Perfiles</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+
+                <article class="col-md-12 Opcion">
+                    @{ strAcceso = (NAcceso.AccesoModulos(Session["User"].ToString(), "04-00") == false) ? "disabled" : ""; }
+                    <a class="btn item @strAcceso" href="@Url.Action("ListaEstacion", "Estacion", new { usuario = Session["User"].ToString() })" style="background:none">
+                        <img src="@Url.Content("~/Images/Icons/configEstacion.png")" class="pull-left" />
+                        <span class="pull-left">Config. de estaciones</span>
+                    </a>
+                </article>
+
+
+                <article class="col-md-12 Opcion">
+                    @{ strAcceso = (NAcceso.AccesoModulos(Session["User"].ToString(), "00-00") == false) ? "disabled" : ""; }
+                    <a class="btn item @strAcceso" href="@Url.Action("Index", "Reporte", new { usuario = Session["User"].ToString() })">
+                        <img src="@Url.Content("~/Images/Icons/report.png")" class="pull-left" />
+                        <span class="pull-left">Reportes</span>
+                    </a>
+                </article>
+            </div>
+        </section>
+
+    </nav>
+
+    <div id="rightPanel_U" class="col-md-push-2 col-md-10" style="margin-top:0px; padding-bottom:2%; ">
+        <div class="row">
+            <div class="col-md-12">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    @RenderSection("scripts", required: false)
+
+    <!--Activar los tooltips: mensaje emergentes-->
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            $(".desplegables").mouseover(function () {
+                $(".desplegables").css("background", "#2A3F54;");
+                $(".desplegables").css("transition", "all 0.2s ease-out");
+            });
+
+            $(".desplegables").mouseout(function () {
+                $(".desplegables").css("background", "rgba(0,0,0,0)");
+                $(".desplegables").css("transition", "all 0.2s ease-out");
+            });
+
+        });
+    </script>
+
+
+
+</body>
+</html>

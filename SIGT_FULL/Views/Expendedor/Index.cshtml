@@ -1,0 +1,285 @@
+﻿@{
+    ViewBag.Title = "Expendedor";
+    Layout = "~/Views/Shared/_ExpendedorLayout.cshtml";
+}
+
+
+
+<div class="col-md-12" style="background:#fff; width:100%; margin:auto; border-radius:25px; z-index:100">
+    <article class="col-md-12" style="height:0px; width:100%; max-width:960px; padding-top:59.25%; position:relative;">
+        <!--contenedor parcial para la carga de datos usando ajax-->
+        <div id="Contenedor_Carga" style="position:absolute; height:95%; width:100%; top:-20px; left:0px; border-radius:25px; text-align:center; margin-top:35px; z-index:200; background:rgba(158,158,158, 0.6); opacity:0.8; display:none">
+            <img src="@Url.Content("~/Images/load.gif")" class="img-responsive" style="position:absolute; left: 50%; top: 40%; transform: translate(-50%, -40%); -webkit-transform: translate(-50%, -40%);" />
+        </div>
+
+        <!--cargar video-->
+        @*<video id="videoM" autoplay muted loop style="position:absolute; height:100%; width:100%; top:0px; left:0px; border-radius:50px; display:block">
+            <source src="@Url.Content("~/Videos/V1.mp4")" type="video/mp4">
+        </video>*@
+
+        <video id="idle_video" autoplay muted onended="onVideoEnded();" style="position:absolute; height:100%; width:100%; top:0px; left:0px; border-radius:50px; display:block"></video>
+        <script>
+            var video_list = ["@Url.Content("~/Videos/V2.mp4")"];
+            var video_index = 0;
+            var video_player = null;
+
+            function onload() {
+                console.log("body loaded");
+                video_player = document.getElementById("idle_video");
+                video_player.setAttribute("src", video_list[video_index]);
+                video_player.play();
+            }
+
+            function onVideoEnded() {
+                console.log("video ended");
+                if (video_index < video_list.length - 1) {
+                    video_index++;
+                }
+                else {
+                    video_index = 0;
+                }
+
+
+                video_player.setAttribute("src", video_list[video_index]);
+                video_player.play();
+            }
+        </script>
+
+        <!--cargar teclado-->
+        <div id="keyboard" style="position:absolute; height:100%; width:100%; top:-20px; left:0px; border-radius:50px; text-align:center; margin-top:35px; display:none">
+            <center>
+                <input type="text" id="CedulaIngresada" name="CedulaIngresada" class="form-control col-md-12" style="max-width:100%; margin-bottom:10px; border:solid 1px #353A42; font-size:38px; padding:20px 1%"  />
+                <textarea class="form-control" id="write" rows="8" cols="30" style="width:100%; max-width:100%; font-size:38px; height:145px;  border:solid 1px #353A42;" placeholder="Ingrese su nombre completo"></textarea>
+                <ul id="keyboard" style="width:100%; position:relative;">
+                    <li class="symbol"><span class="off">`</span><span class="on">~</span></li>
+                    <li class="symbol"><span class="off">1</span><span class="on">!</span></li>
+                    <li class="symbol"><span class="off">2</span><span class="on">@@</span></li>
+                    <li class="symbol"><span class="off">3</span><span class="on">#</span></li>
+                    <li class="symbol"><span class="off">4</span><span class="on">$</span></li>
+                    <li class="symbol"><span class="off">5</span><span class="on">%</span></li>
+                    <li class="symbol"><span class="off">6</span><span class="on">^</span></li>
+                    <li class="symbol"><span class="off">7</span><span class="on">&amp;</span></li>
+                    <li class="symbol"><span class="off">8</span><span class="on">*</span></li>
+                    <li class="symbol"><span class="off">9</span><span class="on">(</span></li>
+                    <li class="symbol"><span class="off">0</span><span class="on">)</span></li>
+                    <li class="symbol"><span class="off">-</span><span class="on">_</span></li>
+                    <li class="symbol"><span class="off">=</span><span class="on">+</span></li>
+                    <li class="delete lastitem">delete</li>
+                    <li class="tab">tab</li>
+                    <li class="letter">q</li>
+                    <li class="letter">w</li>
+                    <li class="letter">e</li>
+                    <li class="letter">r</li>
+                    <li class="letter">t</li>
+                    <li class="letter">y</li>
+                    <li class="letter">u</li>
+                    <li class="letter">i</li>
+                    <li class="letter">o</li>
+                    <li class="letter">p</li>
+                    <li class="symbol"><span class="off">[</span><span class="on">{</span></li>
+                    <li class="symbol"><span class="off">]</span><span class="on">}</span></li>
+                    <li class="symbol lastitem"><span class="off">\</span><span class="on">|</span></li>
+                    <li class="capslock">caps</li>
+                    <li class="letter">a</li>
+                    <li class="letter">s</li>
+                    <li class="letter">d</li>
+                    <li class="letter">f</li>
+                    <li class="letter">g</li>
+                    <li class="letter">h</li>
+                    <li class="letter">j</li>
+                    <li class="letter">k</li>
+                    <li class="letter">l</li>
+                    <li class="symbol"><span class="off">;</span><span class="on">:</span></li>
+                    <li class="symbol"><span class="off">'</span><span class="on">&quot;</span></li>
+                    <li class="return lastitem">return</li>
+                    <li class="left-shift">shift</li>
+                    <li class="letter">z</li>
+                    <li class="letter">x</li>
+                    <li class="letter">c</li>
+                    <li class="letter">v</li>
+                    <li class="letter">b</li>
+                    <li class="letter">n</li>
+                    <li class="letter">m</li>
+                    <li class="symbol"><span class="off">,</span><span class="on">&lt;</span></li>
+                    <li class="symbol"><span class="off">.</span><span class="on">&gt;</span></li>
+                    <li class="symbol"><span class="off">/</span><span class="on">?</span></li>
+                    <li class="right-shift lastitem">shift</li>
+                    <li class="space lastitem">ESPACIO</li>
+                </ul>
+            </center>
+        </div>
+
+
+    </article>
+</div>
+
+<!--botones-->
+<div id="OpcionesRedirect" class="col-md-12" style="margin:5px 0px 25px 0px; display:none">
+    <div class="text-center">
+        <div class="col-md-4" style="top:10px; position:relative; padding:0; margin:0">
+            <a id="btnRestaurar" href="#" class="col-md-12" style="background:#fff; width:100%; margin-top:15px; border-radius:10px; padding:20px 0px; background:#ff6a00; z-index:100">
+                <h1 class="text-center" style="color:#fff; font-weight:bold"><span class="glyphicon glyphicon-chevron-left"></span> REGRESAR</h1>
+            </a>
+        </div>
+
+        <div class="col-md-4 col-md-push-4" style="top:10px; position:relative; padding:0; margin:0">
+            <a id="btnSiguiente" href="#" class="col-md-12" style="background:#fff; width:100%; margin-top:15px; border-radius:10px; padding:20px 0px; background:#16408b; z-index:100">
+                <h1 class="text-center" style="color:#fff; font-weight:bold">SIGUIENTE <span class="glyphicon glyphicon-chevron-right"></span></h1>
+            </a>
+        </div>
+
+        <div class="clearfix"></div>
+
+    </div>
+
+    <div class="clearfix"></div>
+</div>
+
+
+<a id="Redirect" href="#" class="col-md-12" style="width:100%; margin-top:15px; border-radius:0px 0px 50px 50px; padding:20px 0px; background:#16408b;  z-index:100">
+    <h1 class="text-center" style="color:#fff; font-weight:bold"><span class="glyphicon glyphicon-credit-card" style="top:7px"></span> DESLIZA TU CÉDULA DE IDÉNTIDAD</h1>
+</a>
+
+<input class="form-control" type="text" id ="inputCedula" name="inputCedula" style="position:absolute;top:850px; left:30px; z-index:-100; display:block" autofocus />
+
+<script type="text/javascript">
+    var valor;
+    var cedula, idcliente, cliente, tipo;
+    var contAjax = 2;
+
+    //al cargar el documento
+    $(document).ready(function () {
+        //enfocar el campo cedula y resetear el valor en vacio
+        $("#inputCedula").val('');
+        $("#inputCedula").focus();
+
+        //evento keypress para el campo cedula
+        //si detecta "enter"
+        $("#inputCedula").keypress(function (e) {
+            //actualizar valores
+            valor = $("#inputCedula").val()
+            //lo recomiendan para
+            //mayor compatibilidad entre navegadores.
+            var code = (e.keyCode ? e.keyCode : e.which);
+            //si es enter
+            if (code == 13) {
+                obtenerDatos();
+            }
+        });
+
+
+        //en el caso de encontra valores redireccionar
+        //a la siguiente pantalla
+        $("#btnSiguiente").click(function () {
+            cedula = valor;
+            cliente = $("#write").val();
+            Redireccionar(cedula, '', cliente, 2);
+        });
+
+        //evento click en el caso de restaurar interfar
+        $("#btnRestaurar").click(function () {
+            Restaurar();
+
+        });
+
+        //evento click en el cuerpo de la página(body),
+        //con el fin de enfocar el campo cedula
+        $("body").click(function () {
+            $("#inputCedula").focus();
+        });
+
+    });
+
+
+
+    //funcion que permite comunicarse con el controlador
+    //y verificar al usuario
+    function obtenerDatos() {
+        //vaciar el valor del campo
+        $("#inputCedula").val('');
+
+        //comunicarse con el controlador para obtener los datos
+        //del cliente
+        $.ajax({
+            url: '@Url.Action("CatalogoClientes", "Turno")' + "?filtro=" + valor, //controlador + parametro
+            //si encuentra resultado realizar las correspondiente
+            //validaciones
+            success: function (response) {
+                //si no encuentra registro
+                if (response.length == 0) {
+                    //actualizar segundo input de cedula
+                    $("#CedulaIngresada").val(valor);
+                    cedula = ""; cliente = ""; idcliente = ""; tipo = 2;
+                    Ingresar_Manual();
+                }
+
+                //si hay datos, capturar valores encontrados
+                else {
+                    //recorrer la lista
+                    $.each(response, function (i, item) { //recorrer por cada registro
+                        cedula = item.Cedula;
+                        cliente = item.NombreCompleto;
+                        idcliente = item.IdCliente;
+                        tipo = 1
+                    });
+
+                    //redireccionar
+                    Redireccionar(cedula, idcliente, cliente, 1);
+                }
+            },
+
+            complete: function () {
+                $("#Contenedor_Carga").css("display", "none");
+            },
+
+            //mientras realiza la consulta
+            beforeSend: function () {
+                $("#Contenedor_Carga").css("display", "block");
+            }
+        });
+    }
+
+
+    //redireccionar a la siguiente vista
+    //seleccion de datos
+    function Redireccionar(cedula, idcliente, cliente, tipo)
+    {
+        window.location.href = '@Url.Action("SeleccionVisita", "Expendedor")' + "?cedula=" + cedula + "&idcliente=" + idcliente + "&cliente=" + cliente + "&tipo=" + tipo;
+    }
+
+
+    //si no encuentra datos o que haya
+    //realizado un click "DIGITE"
+    //ocultar interfaces
+    function Ingresar_Manual()
+    {
+        $("#videoM").css("display", "none");
+        $("#keyboard").css("display", "block");
+
+        $("#OpcionesRedirect").css("display", "block");
+        $("#Redirect").css("display", "none");
+
+    }
+
+
+    function Restaurar() {
+        $("#videoM").css("display", "block");
+        $("#keyboard").css("display", "none");
+
+        $("#OpcionesRedirect").css("display", "none");
+        $("#Redirect").css("display", "block");
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

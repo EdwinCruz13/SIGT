@@ -1,0 +1,82 @@
+﻿<script>
+    //script que permite crear el diagram de ticket del dia vs total en otras fehcas
+    //guardar en        //usar las siguientes ecuaciones para determinar
+    //los valores a utilizar en las graficas (validar si existe cocientes 0)
+    $(document).ready(function () {
+        _TotalTicket_Dia();
+        function _TotalTicket_Dia() {
+            VPorMi = ('@ViewBag.TicketDia' == 0) ? 0 : (('@ViewBag.PorMi' / '@ViewBag.TicketDia')) * 100;
+            VDia = ('@ViewBag.TicketDia' == 0) ? 0 : (('@ViewBag.TicketDia' - '@ViewBag.PorMi') / '@ViewBag.TicketDia') * 100;
+
+            //crear el diagrama circular en el container2
+            Highcharts.chart('container2', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    backgroundColor: 'rgba(255, 255, 255, 0.0)',
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Relación tickets'
+                },
+                subtitle: {
+                    style: {
+                        fontSize: '11px'
+                    },
+                    text: 'Total de tickets del día  = ' + '@ViewBag.TicketDia' + "<br>Total atendidos = " + '@ViewBag.PorMi'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                credits: {
+                    enabled: false
+                },
+
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        size: "70%",
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                            },
+                            connectorColor: 'silver'
+                        },
+                        showInLegend: true
+                    }
+                },
+                //colors: ['#827717', '#01579b'],
+                series: [{
+                    name: 'Reporte 3',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'Atendidos por mí',
+                        y: VPorMi,
+                        sliced: true,
+                        selected: true
+                    }, {
+                        name: 'Otros',
+                        y: VDia
+                    }]
+                }]
+            });
+
+
+        };
+
+        jQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) { // on tab selection event
+            jQuery("#container2").each(function () {
+                var chart = jQuery(this).highcharts(); // target the chart itself
+                chart.reflow() // reflow that chart
+            });
+        });
+
+    });   
+
+</script>
+<div id="container2" style="z-index:-10"></div>
+

@@ -1,0 +1,361 @@
+﻿
+@{
+    ViewBag.Title = "SeleccionVisita";
+    Layout = "~/Views/Shared/_ExpendedorLayout.cshtml";
+}
+
+
+
+<!--cargar Lista de visitas-->
+<div class="col-md-12" style="background:#fff; width:100%; margin:auto; border-radius:25px; z-index:100; padding:0px">
+    <article class="col-md-12" style="height:auto; width:100%; max-width:1248px; padding-top:59.25%; position:relative; padding:0; margin:0px;">
+
+        <!--contenedor parcial para la carga de datos usando ajax-->
+        <div id="Contenedor_Carga" style="margin:0; padding:0; display:none">
+
+
+            <div class="modal-content" style="height:450px">
+                <div class="modal-header" style="background: rgba(0,71,112,0);">
+                    <h1 class="modal-title" style="color: #000"></h1>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <img src="@Url.Content("~/Images/load.gif")" class="img-responsive" style="position:absolute; left: 50%; top: 40%; transform: translate(-50%, -40%); -webkit-transform: translate(-50%, -40%);margin-top:5rem" />
+                        </div>
+                    </div>
+                </div>
+
+               
+            </div>
+
+
+            
+        </div>
+
+        <section id="Contenedor_Finalizar" class="col-lg-12" style="display:none; margin:0; padding:0; z-index:100">
+            <div class="modal-content">
+                <div class="modal-header" style="background: rgba(0,71,112,0);">
+                    <h1 class="modal-title" style="color: #000"><strong><span class="glyphicon glyphicon-list-alt"></span> Mensaje</strong></h1>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <h2 id="Message" class="text-justify"></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <h2 class="text-justify"><strong>Muchas gracias por su visita.</strong></h2>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+
+        <!--Lista de tipo de visitas que existe en el issdhu-->
+        <section id="Contenedor_ListaMotivo" class="col-lg-12" style="display:block; margin:0; padding:0">
+            <!--contenedor de impresion-->
+            <div id="PrimeraArea" class="col-md-12" style="padding:0; margin:0">
+                <div class="col-md-12" style="padding:0; margin:0px;">
+
+                    <h1 class="text-center"><strong><u>ÁREA DE PRÉSTAMOS</u></strong></h1>
+
+                    <div class="col-md-3 opcionVisita" style="padding:0; margin:0px; background:#fff; padding:3.8%" data-id="1" data-zona="01">
+                        <div class="opacity_visita" style="position: absolute; width:100%; height:100%; display:block; background:rgba(0,0,0, 0.8); margin:0; top:0; left:0; opacity: 1; filter: alpha(opacity=0); z-index:100">
+                            <div style="position:absolute; display:block; width:100%; height:auto; top:7%; padding:5%; font-size:24px; text-align:center">
+                                <center><img src="@Url.Content("~/Images/Expendedor/check.png")" class="img-responsive" width="90" height="90" /></center>
+                                <span class="Area_Visita" style="color:#fff; font-weight:bold">PRÉSTAMOS</span>
+                            </div>
+                        </div>
+                        <center><img src="@Url.Content("~/Images/Expendedor/search.png")" class="img-responsive" width="60" height="60" /></center>
+                        <div class="col-md-12">
+                            <h4 class="text-center" style="color:#3b3838"><strong>Consultas de préstamos</strong></h4>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 opcionVisita" style="padding:0; margin:0px; background:#fff; padding:2.94%" data-id="2" data-zona="01">
+                        <div class="opacity_visita" style="position: absolute; width:100%; height:100%; display:block; background:rgba(0,0,0, 0.8); margin:0; top:0; left:0; opacity: 1; filter: alpha(opacity=0); z-index:100">
+                            <div style="position:absolute; display:block; width:100%; height:auto; top:7%; padding:5%; font-size:24px; text-align:center">
+                                <center><img src="@Url.Content("~/Images/Expendedor/check.png")" class="img-responsive" width="90" height="90" /></center>
+                                <span class="Area_Visita" style="color:#fff; font-weight:bold">PRÉSTAMOS</span>
+                            </div>
+                        </div>
+                        <center><img src="@Url.Content("~/Images/Expendedor/loan_request.png")" class="img-responsive" width="60" height="60" /></center>
+                        <div class="col-md-12">
+                            <h4 class="text-center" style="color:#3b3838"><strong>Entrega de préstamo por RRHH</strong></h4>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3 opcionVisita" style="padding:0; margin:0px; background:#fff; padding:2.8%" data-id="3" data-zona="01">
+                        <div class="opacity_visita" style="position: absolute; width:100%; height:100%; display:block; background:rgba(0,0,0, 0.8); margin:0; top:0; left:0; opacity: 1; filter: alpha(opacity=0); z-index:100">
+                            <div style="position:absolute; display:block; width:100%; height:auto; top:7%; padding:5%; font-size:24px; text-align:center">
+                                <center><img src="@Url.Content("~/Images/Expendedor/check.png")" class="img-responsive" width="90" height="90" /></center>
+                                <span class="Area_Visita" style="color:#fff; font-weight:bold">PRÉSTAMOS</span>
+                            </div>
+                        </div>
+                        <center><img src="@Url.Content("~/Images/Expendedor/loan_procedure.png")" class="img-responsive" width="60" height="60" /></center>
+                        <div class="col-md-12">
+                            <h4 class="text-center" style="color:#3b3838"><strong>Solicitud de trámite de préstamos</strong></h4>
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-3 opcionVisita" style="padding:0; margin:0px; background:#fff; padding:2.8%" data-id="4" data-zona="01">
+                        <div class="opacity_visita" style="position: absolute; width:100%; height:100%; display:block; background:rgba(0,0,0, 0.8); margin:0; top:0; left:0; opacity: 1; filter: alpha(opacity=0); z-index:100">
+                            <div style="position:absolute; display:block; width:100%; height:auto; top:7%; padding:5%; font-size:24px; text-align:center">
+                                <center><img src="@Url.Content("~/Images/Expendedor/check.png")" class="img-responsive" width="90" height="90" /></center>
+                                <span class="Area_Visita" style="color:#fff; font-weight:bold">PRÉSTAMOS</span>
+                            </div>
+                        </div>
+                        <center><img src="@Url.Content("~/Images/Expendedor/loan.png")" class="img-responsive" width="60" height="60" /></center>
+                        <div class="col-md-12">
+                            <h4 class="text-center" style="color:#3b3838"><strong>Estados de cuenta reestructuración</strong></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div id="SegundaArea" class="col-md-12" style="padding:0; margin:0">
+                <div class="col-md-12" style="padding:0; margin:0px;">
+                    <h1 class="text-center"><strong><u>ÁREA DE RECUPERACIONES</u></strong></h1>
+
+
+                    <div class="col-md-3 opcionVisita" style="padding:0; margin:0px; background:#fff; padding:3.8%" data-id="1" data-zona="02">
+                        <div class="opacity_visita" style="position: absolute; width:100%; height:100%; display:block; background:rgba(0,0,0, 0.8); margin:0; top:0; left:0; opacity: 1; filter: alpha(opacity=0); z-index:100">
+                            <div style="position:absolute; display:block; width:100%; height:auto; top:7%; padding:5%; font-size:24px; text-align:center">
+                                <center><img src="@Url.Content("~/Images/Expendedor/check.png")" class="img-responsive" width="90" height="90" /></center>
+                                <span class="Area_Visita" style="color:#fff; font-weight:bold">RECUP.</span>
+                            </div>
+                        </div>
+                        <center><img src="@Url.Content("~/Images/Expendedor/cancellation_loan.png")" class="img-responsive" width="60" height="60" /></center>
+                        <div class="col-md-12">
+                            <h4 class="text-center" style="color:#3b3838"><strong>Estados de cuenta cancelación</strong></h4>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 opcionVisita" style="padding:0; margin:0px; background:#fff; padding:3.8%" data-id="2" data-zona="02">
+                        <div class="opacity_visita" style="position: absolute; width:100%; height:100%; display:block; background:rgba(0,0,0, 0.8); margin:0; top:0; left:0; opacity: 1; filter: alpha(opacity=0); z-index:100">
+                            <div style="position:absolute; display:block; width:100%; height:auto; top:7%; padding:5%; font-size:24px; text-align:center">
+                                <center><img src="@Url.Content("~/Images/Expendedor/check.png")" class="img-responsive" width="90" height="90" /></center>
+                                <span class="Area_Visita" style="color:#fff; font-weight:bold">RECUP.</span>
+                            </div>
+                        </div>
+                        <center><img src="@Url.Content("~/Images/Expendedor/loan_refused2.png")" class="img-responsive" width="60" height="60" /></center>
+                        <div class="col-md-12">
+                            <h4 class="text-center" style="color:#3b3838"><strong>Trámite de reembolso de préstamos</strong></h4>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 opcionVisita" style="padding:0; margin:0px; background:#fff; padding:3.8%" data-id="3" data-zona="02">
+                        <div class="opacity_visita" style="position: absolute; width:100%; height:100%; display:block; background:rgba(0,0,0, 0.8); margin:0; top:0; left:0; opacity: 1; filter: alpha(opacity=0); z-index:100">
+                            <div style="position:absolute; display:block; width:100%; height:auto; top:7%; padding:5%; font-size:24px; text-align:center">
+                                <center><img src="@Url.Content("~/Images/Expendedor/check.png")" class="img-responsive" width="90" height="90" /></center>
+                                <span class="Area_Visita" style="color:#fff; font-weight:bold">RECUP.</span>
+                            </div>
+                        </div>
+                        <center><img src="@Url.Content("~/Images/Expendedor/loan_mortgage.png")" class="img-responsive" width="60" height="60" /></center>
+                        <div class="col-md-12">
+                            <h4 class="text-center" style="color:#3b3838"><strong>Cancelación de Hipoteca/Prenda</strong></h4>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 opcionVisita" style="padding:0; margin:0px; background:#fff; padding:3.8%" data-id="4" data-zona="02">
+                        <div class="opacity_visita" style="position: absolute; width:100%; height:100%; display:block; background:rgba(0,0,0, 0.8); margin:0; top:0; left:0; opacity: 1; filter: alpha(opacity=0); z-index:100">
+                            <div style="position:absolute; display:block; width:100%; height:auto; top:7%; padding:5%; font-size:24px; text-align:center">
+                                <center><img src="@Url.Content("~/Images/Expendedor/check.png")" class="img-responsive" width="90" height="90" /></center>
+                                <span class="Area_Visita" style="color:#fff; font-weight:bold">RECUP.</span>
+                            </div>
+                        </div>
+                        <center><img src="@Url.Content("~/Images/Expendedor/loan_liquidation.png")" class="img-responsive" width="60" height="60" /></center>
+                        <div class="col-md-12">
+                            <h4 class="text-center" style="color:#3b3838"><strong>Estado de cuentas para liquidación</strong></h4>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </article>
+</div>
+
+<!--Opciones para controlar la interfaz-->
+<div id="Contenedor_Opciones" class="col-md-12" style="margin:5px 0px 25px 0px">
+    <div class="text-center">
+        <div class="col-md-12" style="top:10px; position:relative; padding:0; margin:0">
+            <a id="btnRegresar" href="#" class="col-md-12" style="background:#fff; width:100%; margin-top:15px; border-radius:10px; padding:20px 0px; background:#ff6a00; z-index:100">
+                <h1 class="text-center" style="color:#fff; font-weight:bold"><span class="glyphicon glyphicon-chevron-left"></span> REGRESAR</h1>
+            </a>
+        </div>
+
+        <div class="col-md-4 col-md-push-4" style="top:10px; position:relative; padding:0; margin:0; display:none">
+            <a id="btnImprimir" href="#" class="btn col-md-12 disabled" style="background:#fff; width:100%; margin-top:15px; border-radius:10px; padding:20px 0px; background:#16408b; z-index:100">
+                <h1 class="text-center" style="color:#fff; font-weight:bold">GENERAR <span class="glyphicon glyphicon-file"></span></h1>
+            </a>
+        </div>
+
+        <div class="clearfix"></div>
+
+    </div>
+
+    <div class="clearfix"></div>
+</div>
+
+
+    <!--Modal para crear ticket-->
+<div class="modal modal-open fade" id="Modal-TicketCreado" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgba(0,71,112,0);">
+                <button type="button" class="close cierramodal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" style="color:#000"><strong>Mensaje</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <h4 class="text-justify message"></h4>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+    var IdZona, IdMotivo, Area, click, click_Anterior;
+    var url, IdTicket;
+
+    $(document).ready(function () {
+        //al cargar la página la opacidad disminuirla a 0
+        $(".opcionVisita .opacity_visita").css("background", "rgba(0,0,0, 0.8)");
+        $(".opcionVisita .opacity_visita").css("opacity", "0");
+
+
+        //evento click para la selección de una opción
+        $(".opcionVisita").click(function () {
+            //la opcion pasarla a la variable click_anterior
+            click_Anterior = (typeof click === 'undefined') ? '' : click;
+
+            //capturar el objeto del dom, su data IdZona y IdMotivo
+            click = $(this);
+            IdZona = $(this).data('zona');
+            IdMotivo = $(this).data('id');
+            Area = (IdZona == '01') ? "GENERAR TICKET PARA PRÉSTAMOS" : "GENERAR TICKET PARA RECUPERACIONES";
+
+            //restaurar la opcion con sus propiedades de opacidad anteriores
+            $(click_Anterior).find(".opacity_visita").css("opacity", "0");
+            //configurar el nuevo click con la propiedad de opacidad
+            $(click).find(".opacity_visita").css("opacity", "1");
+
+
+            //activar btnImprimir
+            $("#btnImprimir").removeClass('disabled');
+
+
+            //generar ticket automatica usando evento click
+            $("#btnImprimir").click();
+
+
+        });
+
+
+        //evento click para imprimir tickets
+        $("#btnImprimir").click(function () {
+            $("#Contenedor_ListaMotivo").css("display", "none");
+
+            //obtener la información del cliente
+            var _Cliente = {
+                IdCliente: '@ViewBag.IdCliente',
+                NombreCompleto: '@ViewBag.Cliente',
+                Cedula: '@ViewBag.Cedula',
+                TipoCliente: '@ViewBag.Tipo'
+            };
+
+            //agregar el area a un objeto zona
+            var _Zona = {
+                IdZona: IdZona
+            };
+
+            //crear el objeto Motivo
+            var _Motivo = {
+                Zona: _Zona,
+                IdMotivo: IdMotivo
+            };
+
+            //Crear objeto solicitud
+            var _Ticket = {
+                Motivo: _Motivo,
+                Cliente: _Cliente,
+                Observaciones: 'Ticket generado por kiosko'
+            };
+
+
+            //enviar la solicitud via ajax, se enviara el objeto "_Ticket"
+             $.ajax({
+                url: "@Url.Action("_RegistrarTicket", "Expendedor")",
+                data: JSON.stringify(_Ticket), //serializar a json
+                type: "POST", //verbo definido post
+                //se enviará el formato tipo json
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+
+                 //mientras realiza la consulta
+                 beforeSend: function () {
+                     $("#Contenedor_Carga").css("display", "block");
+                 },
+
+                //respuessta
+                 success: function (response) {
+                    //actualizar interfaz
+                    $("#Contenedor_Carga").css("display", "none");
+                    if (response === "true") {
+                        $("#Message").html("Estimado cliente, el ticket ha sido creado, por favor espere hasta que unos de nuestros análista pueda atenderlo");
+                    }
+
+                    else {
+                        $("#Message").html("TICKET GENERADO, PERO EXISTE UN PROBLEMA CON LA IMPRESORA: " + response)
+                    }
+
+                    $("#Contenedor_Finalizar").css("display", "block");
+                   
+                 },
+                //completada la solicitud
+                complete: function () {
+
+                    //redireccionar a la visualizacion de tickets despues de 5s
+                    setTimeout(function () {
+                        window.location.href = '@Url.Action("Index", "Expendedor")' + "?IP=192.168.1.195";
+                    }, 7000);
+
+                },
+               //error
+               error: function (errormessage) {
+                   alert(errormessage.responseText);
+               }
+           });
+
+        });
+
+        //redireccionar
+        $("#btnRegresar").click(function () {
+            window.location.href = '@Url.Action("Index", "Expendedor")' + "?IP=192.168.1.195";
+        });
+
+    });
+</script>
+

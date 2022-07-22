@@ -1,0 +1,68 @@
+﻿@model CapaEntidad.UsuarioPerfil
+
+@{
+    ViewBag.Title = "EditarPerfil";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+
+
+
+<div class="row contentype" style="margin:0px; padding:0px">
+    <section class="col-md-12" style="margin:0px; padding:0px">
+        <div class="col-md-3" style="padding:0px; margin:0px">
+            @{
+                //cargar la vista parcial
+                Html.RenderAction("_ListaControles", "Perfiles");
+            }
+        </div>
+
+        <div class="col-md-6" style="padding:0px; margin:0px">
+            <article class="col-md-12">
+                <div class="col-md-4">
+                    <h5 class="col-md-12 text-center" style="padding: 7px; background: #5d9ac6; border: 1px solid #3a83b7; color: #fff; font-weight: bold">
+                        IdPerfil
+                    </h5>
+                    <h5 class="col-md-12 text-center" style="padding: 7px; background: #fff; border: 1px solid rgba(128, 128, 128,0.4); margin-top:-9px">
+                        @Model.IdPerfil
+                    </h5>
+                </div>
+
+                <div class="col-md-4">
+                    <h5 class="col-md-12 text-center" style="padding: 7px; background: #5d9ac6; border: 1px solid #3a83b7; color: #fff; font-weight: bold">
+                        Descripción
+                    </h5>
+                    <h5 class="col-md-12 text-center" style="padding: 7px; background: #fff; border: 1px solid rgba(128, 128, 128,0.4); margin-top:-9px">
+                        @Model.NombrePerfil
+                    </h5>
+                </div>
+
+                <div class="col-md-4">
+                    <h5 class="col-md-12 text-center" style="padding: 7px; background: #5d9ac6; border: 1px solid #3a83b7; color: #fff; font-weight: bold">
+                        Estado
+                    </h5>
+                    <h5 class="col-md-12 text-center" style="padding: 7px; background: #fff; border: 1px solid rgba(128, 128, 128,0.4); margin-top:-9px">
+                        @Model.Estado
+                    </h5>
+                </div>
+            </article>
+
+            <article class="col-md-12">
+                <fieldset>
+                    <legend>Controles</legend>
+
+                </fieldset>
+            </article>
+
+
+
+        </div>
+
+        <div class="col-md-3" style="padding:0px; margin:0px">
+            @{
+                //cargar la vista parcial
+                Html.RenderAction("_ListaUsuarios", "Perfiles");
+            }
+        </div>
+    </section>
+</div>

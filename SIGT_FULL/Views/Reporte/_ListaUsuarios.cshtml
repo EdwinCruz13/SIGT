@@ -1,0 +1,53 @@
+﻿@model IEnumerable<CapaEntidad.Usuario>
+
+
+
+
+
+<div class="list-group">
+
+    @foreach (var item in Model)
+    {
+        if (item.Area.IdZona == "01" || item.Area.IdZona == "03")
+        {
+            <a class="media list-group-item" data-usuario ="@item.Cuenta">
+                <div class="media-left">
+                    <img class="media-object img-circle" src="@Url.Content("~/Images/Icons/UserDown.png")">
+                </div>
+                <div class="media-body">
+                    <h5 class="media-heading">@item.NombreCompleto</h5>
+                    <h5 style="margin:0"><small><b>Cuenta</b> @item.Cuenta</small></h5>
+                    <h5 style="margin:0"><small><b>Área</b> @item.Area.Descripcion</small></h5>
+
+                </div>
+            </a>
+
+        }
+
+    }
+
+
+    @foreach (var item in Model)
+    {
+        if (item.Area.IdZona == "02")
+        {
+            <a class="media list-group-item" data-usuario ="@item.Cuenta">
+                <div class="media-left">
+                    <img class="media-object img-circle" src="@Url.Content("~/Images/Icons/UserDown.png")">
+                </div>
+                <div class="media-body">
+                    <h5 class="media-heading">@item.NombreCompleto</h5>
+                    <h5 style="margin:0"><small><b>Cuenta</b> @item.Cuenta</small></h5>
+                    <h5 style="margin:0"><small><b>Área</b> @item.Area.Descripcion</small></h5>
+                </div>
+            </a>
+        }
+    }
+
+
+</div>
+
+<script>
+    $(".media.list-group-item").css("cursor", "pointer");
+</script>
+

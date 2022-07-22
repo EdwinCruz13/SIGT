@@ -1,0 +1,597 @@
+﻿@model CapaEntidad.Ticket
+
+
+@{
+    ViewBag.Title = "GenerarTicket";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+<script>
+    $(document).ready(function () {
+        $('#ListadoClientes').DataTable({
+            "lengthChange": false,
+            "pageLength": 25,
+            "bInfo": true,
+            "bFilter": false,
+            "bPaginate": false,
+            "paging": false,
+            "scrollY": "150px",
+            "scrollCollapse": true,
+            "fixedColumns": true,
+            "ordering": false
+        });
+
+        $(".dataTables_empty").html("Realice una búsqueda en el campo");
+
+        //$("#FormTicket").keypress(function (e) {
+        //    if (e.which == 13) {
+        //        return false;
+        //    }
+        //});
+
+        $(".ntype").change(function() {
+            if ($(this).val() == 2) {
+                $(".noType").attr("disabled", true);
+                $(".noType").val("");
+
+                //ocultar el componente de filtro
+                $("#ComponenteFiltro").css("display", "none");
+            }
+            if ($(this).val() == 1) {
+                $(".noType").attr("disabled", false);
+
+                $("#ComponenteFiltro").css("display", "block");
+            }
+
+        });
+
+
+    });
+</script>
+
+<div id="DialogCharge" style="display:none">
+    <h4 id="MessageCharge"><strong>Cargando información...</strong></h4>
+</div>
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagAnterior"><a href="@Url.Action("ListaTicket", "Turno", new { usuario = Session["User"].ToString() })">Turno</a></li>
+            <li class="PagActual">Generar ticket</li>
+        </ol>
+    </section>
+</div>
+
+<div class="row contentype">
+    <div class="form-horizontal col-md-12">
+        <div class="panel panel-info">
+            <div class="row" style="padding:0px; margin:0px">
+                <section class="pull-right col-xs-12 col-md-4" style="padding: 5px; background: #e0e0e0">
+                    <article class="row">
+                        <label class="col-md-6">
+                            @Html.RadioButtonFor(model => model.Cliente.TipoCliente, 1, new { @id = "Afiliado", @class = "ntype", Checked = "checked" })
+                            Afiliado
+                        </label>
+                        <label class="col-md-6">
+                            @Html.RadioButtonFor(model => model.Cliente.TipoCliente, 2, new { @id = "NoAfiliado", @class = "ntype" })
+                            Otros
+                        </label>
+                    </article>
+                </section>
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="row panel-body" style="padding:10px 45px; margin-top:-15px">
+                <!--Datos principales-->
+                <fieldset class="col-md-12" style="margin:20px 0px 0px 0px; padding:0px" id="ComponenteFiltro">
+                    <div class="col-md-12" style="padding:15px 25px 25px 25px; border:1px dashed #c9d4d2">
+                        <div class="form-group">
+                            <label class="TextoInt"><span class="pull-left glyphicon glyphicon-search"></span><h5 class="pull-left" style="margin-left:5px"><strong>Búsqueda de clientes <span style="color:#a84646">*</span></strong></h5></label>
+                            <input id="Filtro" class="form-control" style="max-width:100%" placeholder="Ingrese el valor a Buscar" />
+                        </div>
+
+                        <div class="form-group table-responsive">
+                            <table id="ListadoClientes" class="compact row-border hover" cellspacing="0" width="100%">
+                                <thead style="background:#e0e0e0; ">
+                                    <tr>
+                                        <th class="text-center">IdCliente</th>
+                                        <th class="text-center">Cédula</th>
+                                        <th class="text-center">Nombre Completo</th>
+                                        <th class="text-center">Tipo Cliente</th>
+                                        <th class="text-center">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table_filter"></tbody>
+                            </table>
+                        </div>
+
+                        <script>
+                                //script que permite obtener los registros de clientes en inversiones segun el campo "Filtro"
+                                //el analista digitará texto, y de forma automática se activará el evento que capturar el valor del campo
+                                //pasando al controlador vía ajax, si encuentra datos, formara los registro del tbody en el table
+                                $(document).ready(function () {
+                                    $("#Filtro").change(function () {
+                                        var texto = $(this).val(); //capturar el valor digitado por el usuario
+                                        //enviar datos al controlador por ajax
+                                        $.ajax({
+                                            url: '@Url.Action("CatalogoClientes", "Turno")' + "?filtro=" + texto, //controlador + parametro
+                                            beforeSend: function() {
+                                                $("#DialogCharge").dialog({
+                                                    width: 300,
+                                                    height: 110,
+                                                    modal: true,
+                                                    show: "fadeIn",
+                                                    hide: "fadeOut",
+                                                    dragable: false
+                                                });
+                                            },
+                                            success: function (data) { //si hay respuesta crear los registros que formará parte del tbody del table
+                                                strTable = ""; r = 0;
+                                                $.each(data, function (i, value) { //recorrer por cada registro
+                                                    strTable += "<tr class='reg'>"; //formar el registro
+                                                    //formar los campos
+                                                    strTable += "<td class='text-center IdCliente'>" + value.IdCliente + "</td>";
+                                                    strTable += "<td class='text-center'>" + value.Cedula + "</td>";
+                                                    strTable += "<td class='text-center'>" + value.NombreCompleto + "</td>";
+                                                    strTable += "<td class='text-center'>" + value.TipoPension + "</td>";
+                                                    strTable += "<td class='text-center'>" + ((value.Estado == 1) ? "ACTIVO" : "INACTIVO") + "</td>";
+                                                    strTable += "</tr>";
+                                                    r++;
+                                                });
+                                                //rellenar datos al tbody
+                                                $("#table_filter").html(strTable);
+                                                $(".dataTables_info").html("<strong>Se han encontrado " + r + " registros</strong>");
+
+                                                //evento click para los registros, capturar el valor de IdCliente del registro
+                                                //y lo enviará al controlador para rellenar el formulario
+                                                $(".reg").click(function () {
+                                                    // capturar cliente
+                                                    IdCliente = $(this).find(".IdCliente").text();
+                                                    
+                                                    //enviar los datos al controlador
+                                                    $.ajax({
+                                                        url: '@Url.Action("CatalogoClientes", "Turno")' + "?campo=Id_Cliente&valor=" + IdCliente, //controlador + parametro
+                                                        success: function (data) { //si hay respuesta crear los registros que formará parte del tbody del table
+                                                            //obteniendo la repuesta rellenar los datos al formulario
+                                                            $("#NombreCompleto").val(data[0].NombreCompleto);
+                                                            $("#IdCliente").val(data[0].IdCliente);
+                                                            $("#Cedula").val(data[0].Cedula);
+                                                            $("#NoAsegurado").val(data[0].NoAsegurado);
+                                                            $("#CodFiscal").val(data[0].CodFiscal);
+                                                            $("#CodEmpleado").val(data[0].CodEmpleado);
+
+                                                            //Estado
+                                                            $("#Estado").val(data[0].Estado);
+                                                            $("#EstadoDesc").html((data[0].Estado == 1) ? "ACTIVO" : "INACTIVO");
+                                                            var color = (data[0].Estado == 1) ? "#1b5e20" : "#c62828";
+                                                            $("#EstadoDesc").css("background", color);
+
+                                                            //cargo y ocupacion
+                                                            $("#Cargo").val(data[0].Cargo);
+                                                            $("#Ocupacion").val(data[0].Ocupacion);
+
+                                                            $("#FechaIngreso").val(data[0].FechaIngreso);
+                                                            $('#Sexo option').remove();
+                                                            $('#Sexo').append($('<option>', {
+                                                                value: (data[0].Sexo != 0) ? "F" : "M",
+                                                                text: (data[0].Sexo != 0) ? "FEMENINO" : "MASCULINO"
+                                                            }));
+
+                                                            $('#TipoPension option').remove();
+                                                            $('#TipoPension').append($('<option>', {
+                                                                value: data[0].Id_TipoPension,
+                                                                text: data[0].TipoPension
+                                                            }));
+
+
+                                                            
+                                                            $('#Institucion option').remove();
+                                                            $('#Institucion').append($('<option>', {
+                                                                value: data[0].Id_Institucion,
+                                                                text: data[0].NombreInstitucion
+                                                            }));
+
+                                                        }
+                                                    });
+                                                });
+
+                                            },
+                                            complete: function () {
+                                                $(".reg").hover(function () {
+                                                    $(this).css("cursor", "pointer");
+                                                });
+
+                                                $("#DialogCharge").dialog('close');
+                                            }
+                                        });
+                                    });
+                                });
+                        </script>
+                    </div>
+                </fieldset>
+
+                <!--Datos generales-->
+                <fieldset class="col-md-12" style="margin:20px 0px 0px 0px; padding:0px">
+                    <legend class="Subtitulo">
+                        <span class="pull-left"><strong><span class="glyphicon glyphicon-tasks"></span> Datos Generales</strong></span>
+                        <span class="pull-right">
+                            @Html.TextBoxFor(model => model.Cliente.Estado, new { @type = "hidden", @class = "form-control", @id = "Estado", placeholder = "Estado" })
+                            <span id="EstadoDesc" style="padding: 3px 10px; color:#fff"></span>
+                        </span>
+                        <span class="clearfix"></span>
+                    </legend>
+                    <section class="col-md-6" style="margin: 0px; padding: 0px; border-right: 1px dashed #c9d4d2">
+
+                        <div class="col-md-12" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label><img src="@Url.Content("~/Images/Icons/dni.png")" class="img-responsive pull-left" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Cédula de identidad <span style="color:#a84646">*</span></strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.Cedula, new { @style = "max-width:100%", @id = "Cedula", @class = "form-control", placeholder = "Cedula" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-12" style="padding:0px 25px">
+                            <div class="form-group row">
+                                <label><img src="@Url.Content("~/Images/Icons/dni.png")" class="img-responsive pull-left" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Nombre Completo</strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.NombreCompleto, new { @style = "max-width:100%", @class = "form-control", @id = "NombreCompleto", placeholder = "Nombre Completo" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label><img src="@Url.Content("~/Images/Icons/dni.png")" class="img-responsive pull-left" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>IdCliente <span style="color:#a84646;">*</span></strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.IdCliente, new { @class = "form-control noType", @id = "IdCliente", placeholder = "IdCliente" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label class="TextoInt"><img src="@Url.Content("~/Images/Icons/dni.png")" class="pull-left img-responsive" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Tipo de afiliado</strong></h5></label>
+                                @{
+                                    List<SelectListItem> tafiliado = new List<SelectListItem>();
+                                    tafiliado.Add(new SelectListItem
+                                    {
+                                        Text = "Activos",
+                                        Value = "00",
+                                        Selected = true
+                                    });
+                                    tafiliado.Add(new SelectListItem
+                                    {
+                                        Text = "VEJEZ",
+                                        Value = "01"
+                                    });
+
+                                    tafiliado.Add(new SelectListItem
+                                    {
+                                        Text = "DISCAPACIDAD",
+                                        Value = "02",
+                                    });
+
+                                    tafiliado.Add(new SelectListItem
+                                    {
+                                        Text = "SOBREVIVENCIA",
+                                        Value = "03",
+                                    });
+
+                                    tafiliado.Add(new SelectListItem
+                                    {
+                                        Text = "RETIRO",
+                                        Value = "04",
+                                    });
+                                }
+                                @Html.DropDownListFor(model => model.Cliente.Id_TipoPension, tafiliado, new { @id = "TipoPension", @class = "form-control noType" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label class="TextoInt"><img src="@Url.Content("~/Images/Icons/dni.png")" class="pull-left img-responsive" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Cod Fiscal</strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.CodFiscal, new { @class = "form-control noType", @style = "", @id = "CodFiscal", placeholder = "CodFiscal" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label class="TextoInt"><img src="@Url.Content("~/Images/Icons/Sex.png")" class="pull-left img-responsive" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Sexo <span style="color:#a84646">*</span></strong></h5></label>
+                                @{
+                                    List<SelectListItem> sexo = new List<SelectListItem>();
+                                    sexo.Add(new SelectListItem
+                                    {
+                                        Text = "Femenino",
+                                        Value = "1"
+                                    });
+                                    sexo.Add(new SelectListItem
+                                    {
+                                        Text = "Masculino",
+                                        Value = "2",
+                                        Selected = true
+                                    });
+                                }
+                                @Html.DropDownListFor(model => model.Cliente.Sexo, sexo, new { @id = "Sexo", @class = "form-control noType", placeholder = "Sexo" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label class="TextoInt"><img src="@Url.Content("~/Images/Icons/dni.png")" class="pull-left img-responsive" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Pasaporte</strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.Pasaporte, new { @class = "form-control noType", @style = "", @id = "Pasaporte", placeholder = "Pasaporte" })
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <section class="col-md-6">
+                        <div class="col-md-12" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label class="TextoInt"><img src="@Url.Content("~/Images/Icons/corporative.png")" class="pull-left" alt="issdhuInstitucion" width="30" height="30" /><h5 class="pull-left"><strong>Institución <span style="color:#a84646">*</span></strong></h5></label>
+                                <script>
+                                       $(document).ready(function () {
+                                          $.ajax({
+                                             url: '@Url.Action("ListaInstitucion", "Turno")',
+                                             success: function (data) {
+                                                   instituciones = "";
+                                                   $.each(data, function (i, corp) {
+                                                      instituciones += "<option value='" + corp.Value + "'>" + corp.Text + "</option>";
+                                                   });
+                                                   $("#Institucion").html(instituciones);
+                                                  
+                                             }
+                                          });
+
+                                       });
+                                </script>
+                                @Html.DropDownListFor(model => model.Cliente.Id_Institucion, new SelectList(string.Empty, "", ""), new { @style = "max-width:100%", @id = "Institucion", @class = "form-control noType" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="padding:0px 25px">
+                            <div class="form-group row">
+                                <label><img src="@Url.Content("~/Images/Icons/employee.png")" class="img-responsive pull-left" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Cod Empleado</strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.CodEmpleado, new { @class = "form-control noType", @id = "CodEmpleado", placeholder = "Cod Empleado" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label><img src="@Url.Content("~/Images/Icons/Pensioners.png")" class="img-responsive pull-left" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>No Asegurado</strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.NoAsegurado, new { @class = "form-control noType", @id = "NoAsegurado", placeholder = "No Asegurado" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label class="TextoInt"><img src="@Url.Content("~/Images/Icons/dni.png")" class="pull-left img-responsive" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Fecha de ingreso</strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.FechaIngreso, new { @type = "text", @class = "form-control noType", @id = "FechaIngreso", placeholder = "FechaIngreso" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label class="TextoInt"><img src="@Url.Content("~/Images/Icons/dni.png")" class="pull-left img-responsive" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Ocupación</strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.Ocupacion, new { @class = "form-control noType", @style = "", @id = "Ocupacion", placeholder = "Ocupacion" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-12" style="padding:0px 25px">
+                            <div class="form-group">
+                                <label class="TextoInt"><img src="@Url.Content("~/Images/Icons/dni.png")" class="pull-left img-responsive" alt="issdhuInstitucion" width="20" height="20" /><h5 class="pull-left" style="margin-left:5px"><strong>Cargo</strong></h5></label>
+                                @Html.TextBoxFor(model => model.Cliente.Cargo, new { @style = "max-width:100%", @class = "form-control noType", @id = "Cargo", placeholder = "Cargo" })
+                            </div>
+                        </div>
+
+
+
+                    </section>
+                </fieldset>
+
+                <fieldset class="col-md-12" style="margin:20px 0px 0px 0px; padding:0px">
+                    <legend class="Subtitulo"><h4><strong><span class="glyphicon glyphicon-tasks"></span> Motivo de la visita</strong></h4></legend>
+                    <section class="col-md-12">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="TextoInt"><h5 class="pull-left" style="margin-left:5px"><strong>Área donde se dirige</strong></h5></label>
+                                @Html.DropDownListFor(model => model.Motivo.Zona.IdZona, new SelectList("", "", ""), new { @class = "form-control", @style = "max-width:100%", @id = "Zona", placeholder = "Zona" })
+                            </div>
+                            <script>
+                                      //script que permite carga las areas disponibles,
+                                      //busca el metodo CatalogoZona del controlador 'Turno'
+                                      //la búsqueda lo realiza por ajax
+                                        $(document).ready(function () {
+                                           zona = "";
+                                           $.ajax({
+                                              url: '@Url.Action("CatalogoZona", "Turno")',
+                                              //si existe respuesta, entonces rellenar el select $("#Zona")
+                                              success: function (data) {
+                                                  $.each(data, function (i, value) {
+                                                      if (value.Value == "01")
+                                                          zona += "<option value='" + value.Value + "' selected='selected'>" + value.Text + "</option>";
+                                                      else
+                                                        zona += "<option value='" + value.Value + "'>" + value.Text + "</option>";
+                                                  });
+                                                  $("#Zona").html(zona);
+
+                                              },
+                                              complete: function () {
+                                                  $.ajax({
+                                                      url: '@Url.Action("CatalogoMotivo", "Turno")' + "?IdZona=" + $("#Zona").val(),
+                                                      success: function (data) {
+                                                          visita = "";
+                                                          $.each(data, function (i, value) {
+                                                              visita += "<option value='" + value.Value + "'>" + value.Text + "</option>";
+                                                          });
+                                                          $("#Visita").html(visita);
+                                                      }
+                                                  });
+                                              }
+                                          });
+                                      });
+                            </script>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="TextoInt"><h5 class="pull-left" style="margin-left:5px"><strong>Motivo de la visita</strong></h5></label>
+                                @Html.DropDownListFor(model => model.Motivo.IdMotivo, new SelectList("", "", ""), new { @class = "form-control", @style = "max-width:100%", @id = "Visita", placeholder = "Visita" })
+                            </div>
+                            <script>
+                                    $(document).ready(function () {
+                                        //script que permite carga las los motivos de visita disponibles según la zona,
+                                        //busca el metodo CatalogoMotivo del controlador 'Turno'
+                                        //la búsqueda lo realiza por ajax
+                                        $("#Zona").change(function () {
+                                              CodZona = $(this).val(); //obtener el valor de la zona seleccionada
+                                              $.ajax({
+                                                  url: '@Url.Action("CatalogoMotivo", "Turno")' + "?IdZona=" + CodZona,
+                                                  success: function (data) {
+                                                      visita = "";
+                                                      $.each(data, function (i, value) {
+                                                          visita += "<option value='" + value.Value + "'>" + value.Text + "</option>";
+                                                      });
+                                                      $("#Visita").html(visita);
+                                                  }
+                                              });
+                                          });
+                                      });
+                            </script>
+                        </div>
+
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="TextoInt"><h5 class="pull-left" style="margin-left:5px"><strong>Observaciones</strong></h5></label>
+                                @Html.TextAreaFor(model => model.Observaciones, new { @class = "form-control", @style = "max-width:100%", @id = "Observación", placeholder = "Observación", @rows = "7" })
+                            </div>
+                        </div>
+                    </section>
+                </fieldset>
+            </div>
+
+            <div class="panel-footer">
+                <h4 id="MessageError_Validate" style="color:#a84646" class="pull-left"></h4>
+                <a href="#" id="CRegistro" class="col-xs-12 col-sm-12 col-md-2 col-lg-2 btnAceptado btn btn-primary pull-right">Confirmar registro</a>
+                <div class="clearfix"></div>
+            </div>
+            <!--script que permite validar los campo prioritario y opcionales-->
+            <script>
+                    $(document).ready(function () {
+                        var _Ticket; //variable global
+                        //evento click para confirmar registro
+                        $("#CRegistro").click(function () {
+                            
+
+                            $("#cliente").val($("#NombreCompleto").val());
+                            //Obtener el tipo de cliente
+                            TipoCliente = ($("#Afiliado").is(':checked')) ? 1 : 2;
+
+                            //crear el objeto cliente
+                            var _Cliente = {
+                                IdCliente: $("#IdCliente").val(),
+                                NombreCompleto: $("#NombreCompleto").val(),
+                                Cedula: $("#Cedula").val(),
+                                TipoCliente: TipoCliente,
+                                Id_TipoPension: $("#TipoPension").val(),
+                            };
+
+                            //agregar el area a un objeto zona
+                            var _Zona = {
+                                IdZona: $("#Zona").val()
+                            };
+
+                            //crear el objeto Motivo
+                            var _Motivo = {
+                                Zona: _Zona,
+                                IdMotivo: $("#Visita").val()
+                            };
+
+                            //Crear objeto solicitud
+                            _Ticket = {
+                                Motivo: _Motivo,
+                                Cliente: _Cliente,
+                                Observaciones: $("#Observación").val()
+                            };
+
+
+
+
+                            //actuivar el evento click para el boton btnCrearTicket
+                            $("#btnCrearTicket").click();
+                        });
+
+                        //evento click para generar ticket, se enviara los datos al controlador
+                        $("#btnCrearTicket").click(function () {
+                                //enviar la solicitud via ajax, se enviara el objeto "_Ticket"
+                                $.ajax({
+                                    url: "@Url.Action("_RegistrarTicket", "Turno")",
+                                    data: JSON.stringify(_Ticket), //serializar a json
+                                    type: "POST", //verbo definido post
+                                    //se enviará el formato tipo json
+                                    contentType: "application/json;charset=utf-8",
+                                    dataType: "json",
+                                    //mientras se hace la solicitud
+                                    beforeSend: function () {
+                                        $("#Modal-CrearTicket").modal('hide');
+                                        $("#DialogCharge").dialog({
+                                            width: 300,
+                                            height: 110,
+                                            modal: true,
+                                            show: "fadeIn",
+                                            hide: "fadeOut",
+                                            dragable: false
+                                        });
+
+                                    },
+                                    //respuessta
+                                    success: function (response) {
+                                        if (response != false) {
+                                            // si se genera el ticket redireccionar a la interfaz
+                                            //window.open('@Url.Action("VisualizarTicket", "Turno")' + "?Turno=" + response.Mov, '_blank');
+                                            window.location.href = '@Url.Action("VisualizarTicket", "Turno")' + "?Turno=" + response.Mov;
+                                        }
+                                    },
+                                    //completada la solicitud
+                                    complete: function () {
+                                        $("#DialogCharge").dialog('close');
+                                    },
+                                    //error
+                                    error: function (errormessage) {
+                                        alert(errormessage.responseText);
+                                    }
+                                });
+                            
+                        });
+
+                    });
+            </script>
+
+
+        </div>
+
+    </div>
+
+
+    <!--Modal para crear ticket-->
+    <div class="modal modal-open fade" id="Modal-CrearTicket" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background: rgba(0,71,112,0);">
+                    <button type="button" class="close cierramodal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title" style="color:#000"><strong>Crear Ticket</strong></h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <h4 class="text-justify"><strong>Esta a punto de generar un ticket, ¿Desea continuar con la acción?</strong></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <h4 id="MessageError_Validate" style="color:#a84646" class="pull-left"></h4>
+                    <button class="btnAceptado btn btn-default pull-left" data-dismiss="modal" aria-label="Close">Cerrar</button>
+                    <button class="btnAceptado btn btn-danger pull-right" type="button" id="btnCrearTicket"><span class="glyphicon glyphicon-plus"></span> Generar ticket</button>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

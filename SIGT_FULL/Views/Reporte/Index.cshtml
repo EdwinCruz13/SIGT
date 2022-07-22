@@ -1,0 +1,339 @@
+﻿
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_UsuarioLayout.cshtml";
+}
+
+
+<div class="row contentype">
+    <section>
+        <ol class="breadcrumb">
+            <li class="PagAnterior"><a href="@Url.Action("Index", "Usuario", new { usuario = Session["User"].ToString() })">Usuario</a></li>
+            <li class="PagActual">Reporte general</li>
+        </ol>
+    </section>
+</div>
+
+
+
+
+<!--navba filtosr-->
+<div class="col-md-12" style="padding:0.5rem">
+    <div class="row" style="background:#fff">
+        <section class="col-md-12">
+            <h3 class="pull-left" style="margin-top:0.5rem; color:#2e30a1"><b>Reporte estadístico</b></h3>
+            <nav class="nav navbar-nav pull-right">
+                <form class="navbar-form navbar-right">
+
+                    <div class="form-group" style="margin-left:0.5rem">
+                        <div class="pull-right">
+                            <input type="hidden" id="UsuarioFiltro" class="form-control" placeholder="Usuario" value="@ViewBag.usuario">
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div class="form-group" style="margin-left:0.5rem">
+                        <div class="pull-right">
+                            <input type="text" id="FechaInicio" class="form-control datepicker" placeholder="Fecha de inicio">
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+
+
+                    <div class="form-group" style="margin-left:0.5rem">
+                        <div class="pull-right">
+                            <input type="text" id="FechaFin" class="form-control datepicker" placeholder="Fecha Fin">
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div class="form-group" style="margin-left:0.5rem">
+                        <div class="pull-right">
+                            <a href="#" class="btn btn-primary btn-filter" style="width:7rem"><i class="glyphicon glyphicon-filter"></i> Filtrar</a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+
+                </form>
+
+            </nav>
+            <div class="clearfix"></div>
+        </section>
+    </div>
+</div>
+
+
+
+<!--reporte general areas-->
+<div class="col-md-12" style="margin-top:0.5rem; padding:0">
+    <div class="row">
+        <section class="col-md-12" style="padding:0;">
+            <div class="col-md-12" style="background:#fff; padding:1rem">
+                <div id="ResumenPrestamos" class="col-md-6">
+
+                    @{ Html.RenderAction("_GeneralTickets", "Reporte", new { idarea = "01", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+
+                <div id="ResumenRecuperaciones" class="col-md-6" style="border-left:solid 1px #d1d0d0">
+
+                    @{ Html.RenderAction("_GeneralTickets", "Reporte", new { idarea = "02", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+
+
+<div class="col-md-12" style="margin-top:0.5rem; padding:0">
+    <div class="row">
+        <section class="col-md-12" style="padding:0;">
+            <div class="col-md-12" style="padding:0.5rem">
+                <div id="TotalTickets" class="col-md-12" style="background:#fff; padding:1rem">
+                    @{ Html.RenderAction("_TicketsGenerados", "Reporte", new { fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+            </div>
+
+        </section>
+    </div>
+</div>
+
+
+<div class="col-md-12" style="margin-top:0.5rem; padding:0">
+    <div class="row">
+        <section class="col-md-12" style="padding:0;">
+
+            <div class="col-md-6" style="padding:0.5rem">
+                <div id="TiempoPrestamo" class="col-md-12" style="background:#fff; padding:1rem">
+                    @{ Html.RenderAction("_TiempoAtencionArea", "Reporte", new { idarea = "01", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+            </div>
+
+            <div class="col-md-6" style="padding:0.5rem">
+                <div id="TiempoRecuperaciones" class="col-md-12" style="background:#fff; padding:1rem">
+                    @{ Html.RenderAction("_TiempoAtencionArea", "Reporte", new { idarea = "02", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+<div class="col-md-12" style="margin-top:0.5rem; padding:0">
+    <div class="row">
+        @*<section class="col-md-12" style="padding:0;">
+
+            <div class="col-md-6" style="padding:0.5rem">
+                <div id="RendimientoPrestamo" class="col-md-12" style="background:#fff; padding:1rem">
+                    @{ Html.RenderAction("_RendimientoArea", "Reporte", new { idarea = "01", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+            </div>
+            
+            <div class="col-md-6" style="padding:0.5rem">
+                <div id="RendimientoRecuperaciones" class="col-md-12" style="background:#fff; padding:1rem">
+                    @{ Html.RenderAction("_RendimientoArea", "Reporte", new { idarea = "02", fi = ViewBag.fi, ff = ViewBag.ff }); }
+                </div>
+            </div>
+        </section>*@
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<div class="col-md-12" style="margin-top:0.5rem; padding:0">
+    <div class="row">
+        <section class="col-md-12" style="padding:0;">
+           
+        </section>
+    </div>
+</div>
+
+<div class="col-md-12" style="margin-top:0.5rem; padding:0">
+    <div class="row">
+        <section class="col-md-12" style="padding:0;">
+
+            <div class="col-md-4" style="padding:0.5rem">
+                <div class="col-md-12" style="background:#fff; padding:1rem; height:810px; overflow-y:scroll">
+                    <h4>
+                        <small class="pull-left" style="color:#9e9e9e"><i class="glyphicon glyphicon-user"></i> <b>Lista de usuarios</b></small>
+                        <small class="pull-right" style="color:#9e9e9e"><i class="glyphicon glyphicon-th-list"></i></small>
+                        <span class="clearfix"></span>
+                    </h4>
+                    <hr style="color:#9e9e9e" />
+
+                    @{ Html.RenderAction("_ListaUsuarios", "Reporte"); }
+                </div>
+            </div>
+
+            <div class="col-md-8" style="padding:0.5rem">
+                <div class="col-md-12" style="background:#fff; padding:0rem">
+                    <div id="ResumenUsuario" class="col-md-12">
+                        @{ Html.RenderAction("_GeneralUsuario", "Reporte", new { usuario = ViewBag.usuario, fi = ViewBag.fi, ff = ViewBag.ff }); }
+                    </div>
+                </div>
+
+
+                <div class="col-md-12" style="padding:0rem; margin-top:1rem">
+                    <div class="col-md-6">
+                        <div id="RendimientoUsuario" class="col-md-12" style="background:#fff">
+                            @{ Html.RenderAction("_Rendimiento", "Reporte", new { filtro = "Usuario", busqueda = ViewBag.usuario, fi = ViewBag.fi, ff = ViewBag.ff }); }
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="TiempoUsuario" class="col-md-12" style="background:#fff">
+                            @{ Html.RenderAction("_TiempoAtencionUsuario", "Reporte", new { usuario = ViewBag.usuario, fi = ViewBag.fi, ff = ViewBag.ff }); }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12" style="padding:0rem; margin-top:1rem">
+                    <div class="col-md-12">
+                        <div id="TicketsUsuario" class="col-md-12" style="background:#fff">
+                            @{ Html.RenderAction("_TicketsUsuario", "Reporte", new { usuario = ViewBag.usuario, fi = ViewBag.fi, ff = ViewBag.ff }); }
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+        </section>
+    </div>
+</div>
+
+
+
+
+
+
+@*<div class="col-md-12" style="margin-top:0.5rem; padding:0">
+        <div class="row">
+            <section class="col-md-12" style="padding:0;">
+                <div class="col-md-8" style="padding:0.5rem">
+                    <div class="col-md-12" style="padding:1rem; background:#fff;">
+                        <div class="col-md-12" style="margin-top:1rem; padding:0">
+                            <div id="RendimientoUsuario" class="col-md-6" style="padding:0rem;">
+                                @{ Html.RenderAction("_Rendimiento", "Reporte", new { filtro = "Usuario", busqueda = ViewBag.usuario, fi = ViewBag.fi, ff = ViewBag.ff }); }
+                            </div>
+
+                            <div class="col-md-6" style="padding:0rem;">
+                                @{ Html.RenderAction("_TiempoAtencionUsuario", "Reporte", new { usuario = ViewBag.usuario, fi = ViewBag.fi, ff = ViewBag.ff }); }
+                            </div>
+                        </div>
+
+                        <div class="col-md-12" style="margin-top:1rem; padding:0">
+                            <div class="col-md-12" style="padding:0rem;">
+                                @{ Html.RenderAction("_TicketsUsuario", "Reporte", new { usuario = ViewBag.usuario, fi = ViewBag.fi, ff = ViewBag.ff }); }
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4" style="padding:0.5rem">
+                    <div class="col-md-12" style="background:#fff; padding:1rem; height:810px; overflow-y:scroll">
+                        <h4>
+                            <small class="pull-left" style="color:#9e9e9e"><i class="glyphicon glyphicon-user"></i> <b>Lista de usuarios</b></small>
+                            <small class="pull-right" style="color:#9e9e9e"><i class="glyphicon glyphicon-th-list"></i></small>
+                            <span class="clearfix"></span>
+                        </h4>
+                        <hr style="color:#9e9e9e" />
+
+                        @{ Html.RenderAction("_ListaUsuarios", "Reporte"); }
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </div>*@
+
+
+
+
+
+<script>
+    //Declarar variables principales para el formato de fecha
+    var FechaInicio = '@ViewBag.fi';
+    var FechaFin = '@ViewBag.ff';
+    var Usuario = '@ViewBag.usuario';
+
+    $("#FechaInicio").datepicker();
+    $("#FechaFin").datepicker();
+    $("#FechaInicio").datepicker("option", "dateFormat", "dd/mm/yy");
+    $("#FechaFin").datepicker("option", "dateFormat", "dd/mm/yy");
+
+    $("#FechaInicio").val(FechaInicio);
+    $("#FechaFin").val(FechaFin);
+    $("#UsuarioFiltro").val(Usuario);
+
+
+    //al cargar el boton filtro, ejecutar el evento
+    $(".btn-filter").click(function () {
+        //capturar la fechas para filtros
+        FechaInicio = $("#FechaInicio").val();
+        FechaFin = $("#FechaFin").val();
+        Usuario = $("#UsuarioFiltro").val();
+        
+
+
+
+
+        $('#ResumenPrestamos').load("/Reporte/_GeneralTickets?idarea=01&fi=" + FechaInicio + "&ff=" + FechaFin);
+        $('#ResumenRecuperaciones').load("/Reporte/_GeneralTickets?idarea=02&fi=" + FechaInicio + "&ff=" + FechaFin);
+
+        //reporte de todal de tickets
+        $('#TotalTickets').load("/Reporte/_TicketsGenerados?fi=" + FechaInicio + "&ff=" + FechaFin);
+
+        //distribucion de tiempo
+        $('#TiempoPrestamo').load("/Reporte/_TiempoAtencionArea?idarea=01&fi=" + FechaInicio + "&ff=" + FechaFin);
+        $('#TiempoRecuperaciones').load("/Reporte/_TiempoAtencionArea?idarea=02&fi=" + FechaInicio + "&ff=" + FechaFin);
+
+         
+        //Promedio de rendimiento por area
+        $('#RendimientoPrestamo').load("/Reporte/_RendimientoArea?idarea=01&fi=" + FechaInicio + "&ff=" + FechaFin);
+        $('#RendimientoRecuperaciones').load("/Reporte/_RendimientoArea?idarea=02&fi=" + FechaInicio + "&ff=" + FechaFin);
+
+
+        //reporte de usaurio
+        $('#TicketsUsuario').load("/Reporte/_TicketsUsuario?usuario=" + Usuario + "&fi=" + FechaInicio + "&ff=" + FechaFin);
+        $('#TiempoUsuario').load("/Reporte/_TiempoAtencionUsuario?usuario=" + Usuario + "&fi=" + FechaInicio + "&ff=" + FechaFin);
+        $('#RendimientoUsuario').load("/Reporte/_Rendimiento?filtro=Usuario&busqueda=" + Usuario + "&fi=" + FechaInicio + "&ff=" + FechaFin);
+
+    });
+
+    //evento click al presionar un item que se relaciona al usuario
+    $(".list-group-item").click(function () {
+
+        //capturar datos del formulario
+        Usuario = $(this).data("usuario");
+        FechaInicio = $("#FechaInicio").val();
+        FechaFin = $("#FechaFin").val();
+
+        //recargar los elementos
+        $('#TicketsUsuario').load("/Reporte/_TicketsUsuario?usuario=" + Usuario + "&fi=" + FechaInicio + "&ff=" + FechaFin);
+        $('#TiempoUsuario').load("/Reporte/_TiempoAtencionUsuario?usuario=" + Usuario + "&fi=" + FechaInicio + "&ff=" + FechaFin);
+        $('#RendimientoUsuario').load("/Reporte/_Rendimiento?filtro=Usuario&busqueda=" + Usuario + "&fi=" + FechaInicio + "&ff=" + FechaFin);
+
+
+    });
+
+
+
+
+
+
+
+
+
+
+</script>

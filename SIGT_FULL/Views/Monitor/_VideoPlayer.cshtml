@@ -1,0 +1,104 @@
+﻿
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#jp_container_1").css("display", "none");
+        $("#jp_container_2").css("display", "none");
+        //Inicializar el reproductor con 
+        //una lista de videos de esta manera
+
+        var myPlaylist = new jPlayerPlaylist({
+            jPlayer: "#jquery_jplayer", // ESTE ES EL ID DEL DIV CONTENEDOR, PERZONALIZABLE
+            cssSelectorAncestor: "#jp_container" // ESTE ES EL ID DEL DIV CONTENEDOR, PERZONALIZABLE
+        }, 
+        //agregar lista de videos
+        [{
+            title: "Big Buck Bunny",
+            m4v: "http://www.issdhu.gob.ni/VideosApp/V1.mp4",
+            poster: "http://www.jplayer.org/video/poster/Big_Buck_Bunny_Trailer_480x270.png"
+        },
+        {
+            title: "Big Buck Bunny",
+            m4v: "http://www.issdhu.gob.ni/VideosApp/V0.mp4",
+            poster: "http://www.jplayer.org/video/poster/Big_Buck_Bunny_Trailer_480x270.png"
+        }],
+        {
+            playlistOptions: {
+                autoPlay: true,
+                loopOnPrevious: false, // Reinicia la Reproduccion al final de la lista
+                shuffleOnLoop: true, // Reinicia la Reproduccion al final de la lista en orden ALEATORIO
+                enableRemoveControls: false, // Remueve los controles del Reproductor de Video en HTML 5
+                displayTime: 'slow', // Tiempo para ejecutar la anicacion Slide-up y el Slide-down cuando una nueva lista  es añadida o visualizada
+                addTime: 'fast', // Tiempo de duracion de la animacion Slide-down cuando un nuevo Item es añadido.
+                removeTime: 'fast', // Tiempo de duracion de la animacion Slide-up cuando un nuevo Item es removido.
+                keyEnabled: true,
+                shuffleTime: 'slow' // Tiempo de duracion de la animacion Slide-up y Slide-down cuando la lista esta en Aleatorio.
+        },
+            swfPath: '@Url.Content("~/App/jPlayer/dist/jplayer")', 
+            supplied: "ogv, m4v, oga, mp3", 
+            smoothPlayBar: true, 
+            keyEnabled: true,
+            loop: true,  //repetir videos
+            muted: true,   ///silenciar
+            fullWindow: false, //full
+            fullScreen: false, //full
+            size: {
+                width: "640px",
+                height: "360px",
+                cssClass: "jp-video-360p"
+            },
+        });
+
+
+        $("#jquery_jplayer").css("width", "41.65%");
+        $("#jquery_jplayer").css("height", "285px"); //325
+        $("#jquery_jplayer").css("position", "absolute");
+        $("#jquery_jplayer").css("left", "auto");
+        $("#jquery_jplayer").css("top", "auto");
+        $("#jquery_jplayer").css("margin-bottom", "150px");
+        $(".jp-interface").css("display", "none");
+        $(".jp-details").css("display", "none");
+
+    });
+</script>
+
+<div id="jp_container" class="jp-video jp-video-full" role="application" aria-label="media player" style="border:none">
+    <div class="jp-type-playlist">
+        <div id="jquery_jplayer" class="jp-jplayer"></div>
+        <div class="jp-playlist">
+            <ul>
+                <!-- No BORRAR, ya que cargará el reproductor en una lista de videos -->
+                <li>&nbsp;</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+@*$("#jquery_jplayer").jPlayer({
+        ready: function () {
+            $(this).jPlayer("setMedia", {
+                title: "Big Buck Bunny",
+                m4v: "http://www.issdhu.gob.ni/VideosApp/V1.mp4",
+                poster: "http://www.jplayer.org/video/poster/Big_Buck_Bunny_Trailer_480x270.png"
+            }).jPlayer("play");
+        },
+        swfPath: '@Url.Content("~/App/jPlayer/dist/jplayer")',
+        supplied: "webmv, ogv, m4v",
+        size: {
+            width: "640px",
+            height: "360px",
+            cssClass: "jp-video-360p"
+        },
+        preload: 'metadata',
+        useStateClassSkin: true,
+        autoBlur: false,
+        smoothPlayBar: true,
+        keyEnabled: true,
+        remainingDuration: true,
+        toggleDuration: true,
+        loop: true,
+        muted: false,
+        fullWindow: true,
+        fullScreen: false
+    });*@
+

@@ -1,0 +1,59 @@
+﻿@model List<CapaEntidad.UsuarioControl>
+
+@{
+   string CodModulo = "";
+   string NombreAcordion = "";
+   int Cant = 0;
+   int i = 0;
+}
+
+<div class="col-md-12" style="margin: 0px; padding: 0px; border-radius: 0px">
+    <div class="panel panel-primary" style="border-radius: 0px;">
+        <!-- Default panel contents -->
+        <div class="panel-heading" style="border-radius: 0px; padding: 1px 15px"><h4>Módulos</h4></div>
+        <div class="panel-body" style="margin: 0px; padding: 0px; border-radius: 0px; ">
+            @foreach (var item in Model)
+            {
+                if (CodModulo != item.Modulo.CodModulo)
+                {
+                    CodModulo = item.Modulo.CodModulo;
+                    <div class="panel-group" role="tablist" aria-multiselectable="true" style="margin:20px 0px; padding:0px; border-radius:0px">
+                        <div class="panel panel-default" style="border-radius: 0px;">
+                            <div class="panel-heading" role="tab" style="border-radius: 0px; padding: 5px 5px">
+                                <img src="@Url.Content("~/Images/Icons/dni.png")" width="45" height="45" style="position:absolute; z-index:100; margin-top:-20px; left:6px" />
+                                <h4 class="panel-title" style="margin-left:45px" >
+                                    @{ NombreAcordion = "#collapse_" + Cant;}
+                                    <a class="pull-left" role="button" data-toggle="collapse" data-parent="#accordion" href='@NombreAcordion' aria-expanded="true" aria-controls="@NombreAcordion">
+                                        <strong style="color:#000">@item.Modulo.NombreModulo</strong>
+                                    </a>
+                                    <span class="glyphicon glyphicon-chevron-down pull-right"></span>
+                                    <span class="clearfix"></span>
+                                </h4>
+                                
+                                
+                            </div>
+                            <div id='@NombreAcordion.Replace("#","")' class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                <ul class="panel-body" style="padding: 0px;">
+                                    @for (i = 0; i < Model.Count(); i++){
+                                        if (CodModulo == Model[i].Modulo.CodModulo)
+                                        {
+                                            <li class="list-group-item" style="border-radius:0px"><strong>@Model[i].DescripcionActividad</strong></li>
+                                        }
+                                    }
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+
+                   Cant = Cant + 1;
+                }
+
+            }
+        </div>
+    </div>
+
+</div>
+
+
+

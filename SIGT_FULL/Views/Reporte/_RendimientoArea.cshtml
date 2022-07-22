@@ -1,0 +1,154 @@
+﻿<h4>
+    <small class="pull-left" style="color:#9e9e9e"><i class="glyphicon glyphicon-user"></i> <b>Rendimiento alcanzado por usuario</b></small>
+    <small class="pull-right" style="color:#9e9e9e"><i class="glyphicon glyphicon-tasks"></i></small>
+    <span class="clearfix"></span>
+</h4>
+<hr />
+
+
+<div id="PieGraphAreaRendimiento_@ViewBag.idarea" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script>
+    $(document).ready(function () {
+        var renderGraph;
+        InitializeComponent();
+
+        function InitializeComponent() {
+            $.ajax({
+                url: "@Url.Action("_PieGraph_RendimientoArea", "Reporte")" + "?idarea=" + '@ViewBag.idarea' + "&fi=" + '@ViewBag.fi' + "&ff=" + '@ViewBag.ff',
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result === undefined || result === null) {
+                        renderGraph.destroy();
+                        alert("No existen datos encontrados en ese rango de fecha");
+                    }
+                    else {
+
+                        pieGraph(result);
+                    }
+
+                },
+                beforeSend: function () {
+                    $(".load-img").css("display", "block");
+                },
+                complete: function () {
+                    $(".load-img").css("display", "none");
+                    $(".highcharts-legend").css("display", "none");
+                },
+                error: function () {
+                    alert("Error al cargar grafica");
+                }
+            });
+
+
+        }
+
+        //crear gráfica
+        function pieGraph(lista) {
+            var Series = [];
+            var Usuario = new Object();
+
+            var item = 0;
+            var dias = 0;
+            var user = "";
+            var valor = 0;
+
+            var pieColors = (function () {
+                var colors = [],
+                    base = Highcharts.getOptions().colors[0],
+                    i;
+
+                for (i = 0; i < 10; i += 1) {
+                    // Start out with a darkened base color (negative brighten), and end
+                    // up with a much brighter color
+                    colors.push(Highcharts.Color(base).brighten((i - 3) / 7).get());
+                }
+                return colors;
+            }());
+
+
+            //declarar las opciones del gráfico de barra
+            var options = {
+                chart: { renderTo: 'PieGraphAreaRendimiento_' + '@ViewBag.idarea', plotBackgroundColor: null, plotBorderWidth: null, plotShadow: false, backgroundColor: 'rgba(255, 255, 255, 0.0)', type: 'pie' },
+                title: { text: 'Rendimiento adquirido en ' + '@ViewBag.area' + '  <br> del ' + FechaInicio + " al " + FechaFin },
+                 subtitle: {
+                     align: 'center',
+                     text: '',
+                     style: { fontSize: '11px' }
+                },
+
+                credits: {  enabled: false },
+                tooltip: {
+                    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f} %</b><br/>'
+                },
+                credits: {
+                    enabled: false
+                },
+
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        size: "90%",
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                            },
+                            connectorColor: 'silver'
+                        },
+                        //colors: pieColors,
+                        showInLegend: true
+                    }
+                },
+
+
+                series: [
+                    {
+                        name: 'Rendimiento',
+                        colorByPoint: true,
+                        data: [{}]
+                    }
+                ]
+            };
+
+            lista.RendimientoUsuario.forEach(function (elementos, index) {
+                user = "";
+                valor = 0;
+                dias = 0;
+                Usuario = new Object();
+
+                //recorrer elementos por usuario
+                elementos.forEach(function (rendimiento, index) {
+                    user = rendimiento.Usuario;
+                    valor = valor + rendimiento.Rendimiento;
+
+                    dias = dias + 1;
+                });
+
+                //añadir elementos a la lista serie
+                Usuario["name"] = user;
+                Usuario["y"] = (valor / dias),
+                Usuario["drilldown"] = user,
+                Series.push(Usuario);
+
+                item = item + 1;
+            });
+
+          
+            //agregar a la serie los datos
+            options.series[0].data = Series;
+            renderGraph = new Highcharts.Chart(options);
+
+        }
+    });
+</script>
+
+
+
+
+
+
