@@ -3,7 +3,7 @@
 <h3 align="center">Instructivo del uso del sistema de gestor de turno</h3> 
 <h4 align="center">Plataforma que permite ordenar el proceso de atención al cliente de manera presencial, midiendo el rendimiento y agilizar el proceso de trámite.</h4>
 
-<details open="">
+<details close="">
   <summary><b><g-emoji class="g-emoji" alias="sparkles" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png">✨</g-emoji>Images</b></summary>
   <br>
 <p dir="auto"> Here some pics of the application</p>
