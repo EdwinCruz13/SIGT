@@ -4,16 +4,15 @@
 <h4 align="center">Plataforma que permite ordenar el proceso de atención al cliente de manera presencial, midiendo el rendimiento y agilizar el proceso de trámite.</h4>
 
 <details open="">
-  <summary><b><g-emoji class="g-emoji" alias="sparkles" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png">✨</g-emoji>&nbsp;&nbsp;About&nbsp;Me</b></summary>
+  <summary><b><g-emoji class="g-emoji" alias="sparkles" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png">✨</g-emoji>Images</b></summary>
   <br>
-<p dir="auto"> Here some pics of the application
-  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/1-login.png?raw=true" width="100%" height="280" />
-  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/2-dashboard.png?raw=true" width="100%" height="280" />
-  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/3-station%20managment.png?raw=true" width="100%" height="280" />
-  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/4-reports.png?raw=true" width="100%" height="280" />
-  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/5-Attendance.png?raw=true" width="100%" height="280" />
-  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/5-Attendance.png?raw=true" width="100%" height="280" />
-</p>
+<p dir="auto"> Here some pics of the application</p>
+  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/1-login.png?raw=true" width="320" height="280" />
+  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/2-dashboard.png?raw=true" width="320" height="280" />
+  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/3-station%20managment.png?raw=true" width="320" height="280" />
+  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/4-reports.png?raw=true" width="320" height="280" />
+  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/5-Attendance.png?raw=true" width="320" height="280" />
+  <img src="https://github.com/EdwinCruz13/SIGT/blob/master/tutorial/waiting3.png?raw=true" width="320" height="280" /> 
 </details>
 
 
