@@ -13,7 +13,7 @@ namespace CapaDatos
         //protected string strSigh = "Data Source = .; Initial Catalog = SIGT; User Id = sa; Password = 123456; Connect Timeout=30000";
 
         //Cadena de Conexión al Server 1.4
-        protected string strSigh = "Data Source = 192.168.101.4; Initial Catalog = Sigt; User Id = Sigt; Password = 51GtPr0j3Ct.2020$+-*.; Connect Timeout=30000";
+        protected string strSigh = "Data Source = 192.168.101.4; Initial Catalog = Sigt; User Id = Sigt; Password = jajajaja; Connect Timeout=30000";
 
         //Se utiliza como interface a fin de poder utilizarla en cualquier momento
         protected SqlConnection iConnection;
